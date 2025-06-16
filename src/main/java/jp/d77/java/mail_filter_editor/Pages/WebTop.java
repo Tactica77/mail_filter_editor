@@ -53,6 +53,8 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
         this.m_config.alertInfo.addStringBr( startDate + "から" + endDate + "まで表示します。" );
         this.m_config.alertInfo.addStringBr( "(W)...whois検索" );
         this.m_config.alertInfo.addStringBr( "(S)...subnet一覧表示" );
+
+        //this.m_datas.save( LocalDate.of( 2025, 6, 14 ) );
     }
 
     /**

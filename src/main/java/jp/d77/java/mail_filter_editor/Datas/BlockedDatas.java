@@ -1,8 +1,14 @@
 package jp.d77.java.mail_filter_editor.Datas;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -39,13 +45,44 @@ public class BlockedDatas {
         return this.m_datas;
     }
 
-    public LocalDateTime cnvDateTime( LocalDate d, String t ){
+    public boolean save( LocalDate target_date ){
+        String YM = ToolDate.Fromat( target_date, "uuuuMM" );
+        String YMD = ToolDate.Fromat( target_date, "uuuuMMdd" );
+        String filename = this.m_config.getDataFilePath() + "/log/" + YM + "/block_ip_" + YMD + ".log";
+        File f_filename = new File( filename );
+        Debugger.LogPrint( "file=" + filename );
+
+        // すでにファイルが存在していればバックアップを作成
+        File f_bkfile = new File( filename + ".bak" );
         try {
-            LocalTime at = LocalTime.parse( t );
-            return LocalDateTime.of( d, at );
-        } catch (DateTimeParseException e) {
-            return null;
+            if ( f_filename.exists()) {
+                Files.copy( f_filename.toPath(), f_bkfile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                Debugger.LogPrint( "backup " + f_bkfile );
+            }
+        } catch ( Exception e) {
+            e.printStackTrace();
+            this.m_config.alertError.addStringBr( "ファイルのバックアップに失敗しました:" + filename + " -> " + f_bkfile + " e=" + e.getMessage() );
+            return false;
         }
+
+        if ( this.m_filedatas.containsKey( YMD ) == false ) {
+            this.m_config.alertError.addStringBr( "保存するデータが存在しません。" );
+            return false;
+        }
+
+        ArrayList<BlockData> bds = this.m_filedatas.get(YMD);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            for ( BlockData bd: bds ){
+                writer.write( bd.getSaveLine() );
+                writer.newLine();  // 改行
+            }
+            this.m_config.alertInfo.addStringBr( "ファイルを書き出しました:" + filename );
+        } catch (IOException e) {
+            this.m_config.alertError.addStringBr( "ファイルの書き出しに失敗しました:" + filename + " e=" + e.getMessage() );
+            e.printStackTrace();
+        }
+
+        return true;
     }
 
     public boolean load( LocalDate target_date ){
@@ -73,7 +110,7 @@ public class BlockedDatas {
                 d = new BlockData();
                 this.m_filedatas.get( YMD ).add(d);
 
-                // 0: date tune
+                // 0: date time
                 d.m_datetime.add(dt);
 
                 // 1: ip
@@ -98,6 +135,7 @@ public class BlockedDatas {
                 // 7: org
                 if ( columns.length >= 8 ) d.m_org = columns[7];
             }
+        } catch (FileNotFoundException e) {
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -137,6 +175,21 @@ public class BlockedDatas {
                 this.countScore( "ORG", bd_to.m_org );
                 bd_to.countup();
             }
+        }
+    }
+
+    /**
+     * 日と時を結合してLocalDateTimeを返す
+     * @param d
+     * @param t
+     * @return
+     */
+    public LocalDateTime cnvDateTime( LocalDate d, String t ){
+        try {
+            LocalTime at = LocalTime.parse( t );
+            return LocalDateTime.of( d, at );
+        } catch (DateTimeParseException e) {
+            return null;
         }
     }
 

@@ -12,6 +12,7 @@ import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
 import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
 import jp.d77.java.mail_filter_editor.BasicIO.HtmlString;
 import jp.d77.java.mail_filter_editor.Pages.AbstractWebPage;
+import jp.d77.java.mail_filter_editor.Pages.WebBlockEditor;
 import jp.d77.java.mail_filter_editor.Pages.WebSubnets;
 import jp.d77.java.mail_filter_editor.Pages.WebTop;
 import jp.d77.java.mail_filter_editor.Pages.WebWhois;
@@ -50,12 +51,42 @@ public class MailFilterEditorMain {
         return this.procWeb( web );
     }
 
+    @RequestMapping("/block_editor")  // ルートへこのメソッドをマップする
+    public String BlockEditor( HttpServletRequest request ) {
+        Debugger.LogPrint( "------ START ------" );
+
+        // 表示用クラスの設定
+        AbstractWebPage web = new WebBlockEditor( new WebConfig( "/block_editor" ) );
+
+        // Modeを取得
+        web.getConfig().addMethod("mode", WebUtils.findParameterValue(request, "mode") );
+        Map<String, Object> params;
+
+        // フォーム投稿を取得(edit_から始まる項目を取得)
+        params = WebUtils.getParametersStartingWith(request, "edit_");
+        if (!params.isEmpty()) {
+            for (Entry<String, Object> e : params.entrySet()) {
+                web.getConfig().addMethod("edit_" + e.getKey(), e.getValue().toString() );
+            }
+        }
+
+        // フォーム投稿を取得(submit_から始まる項目を取得)
+        params = WebUtils.getParametersStartingWith(request, "submit_");
+        if (!params.isEmpty()) {
+            for (Entry<String, Object> e : params.entrySet()) {
+                web.getConfig().addMethod("edit_" + e.getKey(), e.getValue().toString() );
+            }
+        }
+
+        return this.procWeb( web );
+    }
+
     @RequestMapping("/whois")  // ルートへこのメソッドをマップする
     public String whois( HttpServletRequest request ) {
         Debugger.LogPrint( "------ START ------" );
 
         // 表示用クラスの設定
-        AbstractWebPage web = new WebWhois( new WebConfig( "/" ) );
+        AbstractWebPage web = new WebWhois( new WebConfig( "/whois" ) );
 
         // Modeを取得
         web.getConfig().addMethod("ip", WebUtils.findParameterValue(request, "ip") );
@@ -68,7 +99,7 @@ public class MailFilterEditorMain {
         Debugger.LogPrint( "------ START ------" );
 
         // 表示用クラスの設定
-        AbstractWebPage web = new WebSubnets( new WebConfig( "/" ) );
+        AbstractWebPage web = new WebSubnets( new WebConfig( "/subnets" ) );
 
         // Modeを取得
         web.getConfig().addMethod("ip", WebUtils.findParameterValue(request, "ip") );

@@ -61,4 +61,53 @@ public class BlockData {
         return this.m_count;
     }
 
+    /**
+     * 保存用１行データへ変換する
+     * @return
+     */
+    public String getSaveLine(){
+        String ret = "";
+
+        // 0: date time
+        if ( this.m_datetime == null ) ret += "";
+        else ret += ToolDate.Fromat( this.m_datetime.get(0), "HH:mm:ss");
+        ret += "<>";
+
+        // 1: ip
+        if ( this.m_ip == null ) ret += "";
+        else ret += m_ip;
+        ret += "<>";
+
+        // 2: range
+        if ( this.m_range == null ) ret += "";
+        else ret += m_range;
+        ret += "<>";
+
+        // 3: codes
+        if ( this.m_error_codes == null ) ret += "";
+        else if ( this.m_error_codes.size() <= 0 ) ret += "";
+        else ret += m_error_codes.get(0);
+        ret += "<>";
+
+        // 4: cc
+        if ( this.m_country_code == null ) ret += "";
+        else ret += m_country_code;
+        ret += "<>";
+
+        // 5: from
+        if ( this.m_from == null ) ret += "";
+        else ret += m_from;
+        ret += "<>";
+
+        // 6: to
+        if ( this.m_to == null ) ret += "";
+        else ret += m_to;
+        ret += "<>";
+
+        // 7: org
+        if ( this.m_org == null ) ret += "";
+        else ret += m_org;
+
+        return ret;
+    }
 }

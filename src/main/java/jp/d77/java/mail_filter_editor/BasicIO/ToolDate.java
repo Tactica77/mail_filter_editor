@@ -2,6 +2,7 @@ package jp.d77.java.mail_filter_editor.BasicIO;
 
 import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -19,6 +20,24 @@ import java.util.Optional;
  * @since 1.0.0 2025.06.15
  */
 public class ToolDate {
+    /**
+     * LocalDateTimeを指定の形式に変換する。変換できない場合は「-」を返す。
+     * @param input 変換対象の文字列（YYYYMM形式）
+     * @param pattern 結果パターン。uuuuMMdd、HH:mm:ssなど
+     * @return 変換後の文字列。変換できない場合は「-」
+     * @since 2025.06.16
+     */
+    public static String Fromat(LocalDateTime input, String pattern ){
+        if (input == null) return "-";
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern( pattern );
+            return input.format(formatter);
+        }catch (IllegalArgumentException | DateTimeException e) {
+            e.printStackTrace();
+            return "-";
+        }
+    }
+
     /**
      * LocalDateを指定の形式に変換する。変換できない場合は「-」を返す。
      * @param input 変換対象の文字列（YYYYMM形式）
