@@ -44,7 +44,7 @@ public class MailFilterEditorMain {
         params = WebUtils.getParametersStartingWith(request, "submit_");
         if (!params.isEmpty()) {
             for (Entry<String, Object> e : params.entrySet()) {
-                web.getConfig().addMethod("edit_" + e.getKey(), e.getValue().toString() );
+                web.getConfig().addMethod("submit_" + e.getKey(), e.getValue().toString() );
             }
         }
 
@@ -66,7 +66,12 @@ public class MailFilterEditorMain {
         params = WebUtils.getParametersStartingWith(request, "edit_");
         if (!params.isEmpty()) {
             for (Entry<String, Object> e : params.entrySet()) {
-                web.getConfig().addMethod("edit_" + e.getKey(), e.getValue().toString() );
+                if ( e.getValue() instanceof String[] ){
+                    // 配列の場合
+                    web.getConfig().addMethodLists("edit_" + e.getKey(), (String[])e.getValue() );
+                }else{
+                    web.getConfig().addMethod("edit_" + e.getKey(), e.getValue().toString() );
+                }
             }
         }
 
@@ -74,7 +79,7 @@ public class MailFilterEditorMain {
         params = WebUtils.getParametersStartingWith(request, "submit_");
         if (!params.isEmpty()) {
             for (Entry<String, Object> e : params.entrySet()) {
-                web.getConfig().addMethod("edit_" + e.getKey(), e.getValue().toString() );
+                web.getConfig().addMethod("submit_" + e.getKey(), e.getValue().toString() );
             }
         }
 

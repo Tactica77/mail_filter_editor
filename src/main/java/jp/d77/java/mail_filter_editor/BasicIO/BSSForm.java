@@ -132,7 +132,8 @@ public class BSSForm {
             value = opts.get( "default_value" ).orElse( "" );
         }
         
-        this.topStr += BSSForm.sp() + "<INPUT type=\"" + type + "\" name=\"" + HtmlString.HtmlEscape(name) + "\" class=\"form-control\" id=\"" + HtmlString.HtmlEscape(name) + "\" value=\"" + HtmlString.HtmlEscape(value) + "\">" + "\n";
+        //this.topStr += BSSForm.sp() + "<INPUT type=\"" + type + "\" name=\"" + HtmlString.HtmlEscape(name) + "\" class=\"form-control\" id=\"" + HtmlString.HtmlEscape(name) + "\" value=\"" + HtmlString.HtmlEscape(value) + "\">" + "\n";
+        this.topStr += BSSForm.sp() + "<INPUT type=\"" + type + "\" name=\"" + HtmlString.HtmlEscape(name) + "\" value=\"" + HtmlString.HtmlEscape(value) + "\">" + "\n";
         this.backup_opts.put( FTYPE.FORM_INPUT, opts);
         return this;
     }

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
@@ -17,6 +18,7 @@ import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
 public class BlackList {
     private WebConfig   m_config;
     private ArrayList<BlackListData>    m_datas;
+    private boolean m_isUpdate = false;
 
     public BlackList( WebConfig cfg ){
         this.m_config = cfg;
@@ -25,13 +27,66 @@ public class BlackList {
 
     public void init(){
         this.m_datas = new ArrayList<BlackListData>();
+        this.m_isUpdate = false;
     }
 
     public ArrayList<BlackListData> getDatas(){
         return this.m_datas;
     }
 
+    /**
+     * 指定のCIDRデータを検索する
+     * @param cidr
+     * @return
+     */
+    public Optional<BlackListData> findBlackListData( String cidr ){
+        for ( BlackListData bld: this.m_datas ){
+            if ( bld.getCidr().equals( cidr ) ){
+                return Optional.ofNullable( bld );
+            }
+        }
+        return Optional.empty();
+    }
+    
+    public void enable( String cidr ){
+        BlackListData bld = this.findBlackListData(cidr).orElse( null );
+        if ( bld == null ){
+            this.m_config.alertError.addStringBr( "データが見つかりませんでした:" + cidr );
+        }else{
+            bld.enabled( true );
+            this.m_isUpdate = true;
+            this.m_config.alertError.addStringBr( "有効にしました:" + cidr );
+        }
+    }
+
+    public void disable( String cidr ){
+        BlackListData bld = this.findBlackListData(cidr).orElse( null );
+        if ( bld == null ){
+            this.m_config.alertError.addStringBr( "データが見つかりませんでした:" + cidr );
+            return;
+        }else{
+            bld.enabled( false );
+            this.m_isUpdate = true;
+            this.m_config.alertError.addStringBr( "無効にしました:" + cidr );
+        }
+    }
+
+    public void remove( String cidr ){
+        for ( int i = 0; i < this.m_datas.size(); i++ ){
+            if ( this.m_datas.get(i).getCidr().equals( cidr ) ){
+                if ( this.m_datas.get(i).isEnable() ){
+                    this.m_config.alertError.addStringBr( "先に無効化しないと削除できません:" + cidr );    
+                }else{
+                    this.m_datas.remove( i );
+                    this.m_config.alertError.addStringBr( "データを削除しました:" + cidr );
+                    this.m_isUpdate = true;
+                }
+            }
+        }
+    }
+
     public boolean save(){
+        if ( this.m_isUpdate == false ) return false;
         String filename = this.m_config.getDataFilePath() + "/block_list_black.txt";
         File f_filename = new File( filename );
         Debugger.LogPrint( "file=" + filename );

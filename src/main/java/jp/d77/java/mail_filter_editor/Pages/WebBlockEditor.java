@@ -38,6 +38,29 @@ public class WebBlockEditor extends AbstractWebPage implements InterfaceWebPage{
      */
     @Override
     public void post_save_reload() {
+        if ( this.m_config.getMethod( "submit_disable" ).isPresent() ){
+            for ( String v: this.m_config.getMethodLists( "edit_select_cidr" ) ){
+                this.m_black_list.disable( v );
+            }
+            if ( this.m_config.getMethod( "edit_select_cidr" ).isPresent() ){
+                this.m_black_list.disable( this.m_config.getMethod( "edit_select_cidr" ).get() );
+            }
+        }else if ( this.m_config.getMethod( "submit_enable" ).isPresent() ){
+            for ( String v: this.m_config.getMethodLists( "edit_select_cidr" ) ){
+                this.m_black_list.enable( v );
+            }
+            if ( this.m_config.getMethod( "edit_select_cidr" ).isPresent() ){
+                this.m_black_list.enable( this.m_config.getMethod( "edit_select_cidr" ).get() );
+            }
+        }else if ( this.m_config.getMethod( "submit_delete" ).isPresent() ){
+            for ( String v: this.m_config.getMethodLists( "edit_select_cidr" ) ){
+                this.m_black_list.remove( v );
+            }
+            if ( this.m_config.getMethod( "edit_select_cidr" ).isPresent() ){
+                this.m_black_list.remove( this.m_config.getMethod( "edit_select_cidr" ).get() );
+            }
+        }
+        this.m_black_list.save();
     }
 
     /**
@@ -101,12 +124,31 @@ public class WebBlockEditor extends AbstractWebPage implements InterfaceWebPage{
     private void dispTable(){
         if ( this.m_black_list == null ) return;
                 BSSForm f = BSSForm.newForm();
+        f.formTop( this.m_config.Uri, false);
         f.tableTop(
             new BSOpts()
                 .id( "mfe-table")
                 .fclass("table table-bordered table-striped")
                 .border("1")
             );
+        
+        f.divRowTop();
+
+        f.divTop(2 );
+        f.formSubmit( BSOpts.init( "name", "submit_disable").value( "DISABLE" ).label( "DISABLE" ) );
+        f.divBtm(2 );
+
+        f.divTop(2 );
+        f.formSubmit( BSOpts.init( "name", "submit_enable").value( "ENABLE" ).label( "ENABLE" ) );
+        f.divBtm(2 );
+
+        f.divTop(2 );
+        f.formSubmit( BSOpts.init( "name", "submit_delete").value( "DELETE" ).label( "DELETE" ) );
+        f.divBtm(2 );
+
+        f.divTop(6 );
+        f.divBtm(6 );
+        f.divRowBtm();
 
         f.tableHeadTop();
         f.tableRowTh( "CMD", "YMD", "CC", "CIDR", "Organization");
@@ -121,7 +163,14 @@ public class WebBlockEditor extends AbstractWebPage implements InterfaceWebPage{
             f.tableRowTop();
 
             // Cmd
-            f.tableTd( "-", opt );
+            f.tableTdHtml( 
+                BSSForm.newForm().formInput(
+                        BSOpts
+                        .init( "type", "checkbox")
+                        .set("name", "edit_select_cidr" )
+                        .set("value", bld.getCidr())
+                ).toString()
+                , opt );
 
             // YMD
             f.tableTd( bld.getAddDate().orElse( "-" ), opt );
@@ -140,6 +189,7 @@ public class WebBlockEditor extends AbstractWebPage implements InterfaceWebPage{
 
         f.tableBodyBtm();
         f.tableBtm();
+        f.formBtm();
 
         this.m_html.addString( f.toString() );
     }

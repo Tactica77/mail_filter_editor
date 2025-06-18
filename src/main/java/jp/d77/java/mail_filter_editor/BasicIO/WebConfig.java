@@ -1,6 +1,7 @@
 package jp.d77.java.mail_filter_editor.BasicIO;
 
 import java.nio.file.FileSystems;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.Set;
@@ -9,6 +10,7 @@ import jp.d77.java.mail_filter_editor.MailFilterEditorApplication;
 
 public class WebConfig {
     private HashMap<String,String> Methods;
+    private HashMap<String,ArrayList<String>> MethodLists;
 
     public String ProgramName = "";
     public String ProgramVersion = "";
@@ -26,6 +28,7 @@ public class WebConfig {
     // コンストラクタ
     public WebConfig( String Uri ){
         this.Methods = new HashMap<String,String>();
+        this.MethodLists = new HashMap<String,ArrayList<String>>();
         this.Uri = Uri;
         this.ProgramName = ProgramProp.getProgram();
         this.ProgramVersion = ProgramProp.getVersion();
@@ -56,10 +59,28 @@ public class WebConfig {
         }
     }
 
+    public void addMethodLists( String name, String[] values ){
+        if ( values == null ){
+        }else if ( values.length <= 0 ){
+        }else{
+            this.MethodLists.put(name, new ArrayList<String>());
+            for ( String v: values ){
+                Debugger.LogPrint( "name=" + name + " value=" + v);
+                this.MethodLists.get(name).add(v);
+                this.alertBottomInfo.addStringBr("addMethodLists name=" + name + " value=" + v);
+            }
+        }
+    }
+
     // Method取得
     public Optional<String> getMethod( String name ){
         if ( ! this.Methods.containsKey( name ) ) return Optional.empty();
         return Optional.ofNullable( this.Methods.get(name) );
+    }
+
+    public String[] getMethodLists( String name ){
+        if ( ! this.MethodLists.containsKey( name ) ) return new String[0];
+        return this.MethodLists.get(name).toArray( new String[0] );
     }
 
     // Method空チェック
