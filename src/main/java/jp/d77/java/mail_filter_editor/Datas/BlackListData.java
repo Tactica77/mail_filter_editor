@@ -2,13 +2,17 @@ package jp.d77.java.mail_filter_editor.Datas;
 
 import java.util.Optional;
 
+import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
+import jp.d77.java.mail_filter_editor.BasicIO.ToolNet;
+
 public class BlackListData {
-    private String m_cidr;
-    private String m_add_date;
-    private String m_country_code;
-    private String m_org;
+    private String  m_cidr;
+    private String  m_add_date;
+    private String  m_country_code;
+    private String  m_org;
     private boolean m_enable;
-    private String m_line;
+    private String  m_line;
+    private String  m_duplicate_cidr;
 
     /**
      * ファイルから読み込んだ行データを格納する
@@ -86,4 +90,16 @@ public class BlackListData {
         this.m_line += " ";
         if ( this.m_org != null ) this.m_line += this.m_org;
     }
+
+    public Optional<String> getDuplicateCidr(){
+        return Optional.ofNullable( this.m_duplicate_cidr );
+    }
+
+    public void checkDuplicateCidr( String cidr ){
+        if ( ToolNet.isWithinCIDR( cidr, this.m_cidr ).orElse("").equals( cidr ) ){
+            this.m_duplicate_cidr = cidr;
+            Debugger.LogPrint( this.m_cidr + " is contained in " + cidr );
+        }
+    }
+
 }

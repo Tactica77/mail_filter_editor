@@ -270,12 +270,20 @@ public class BSSForm {
                 ds += "<BR>\n" + HtmlString.HtmlEscape(ss);
             }
         }
-        this.topStr += BSSForm.sp() + "<TD" + String.join(" ", opts) + ">" + ds + "</TD>\n";
+        if ( opts.length > 0 ){
+            this.topStr += BSSForm.sp() + "<TD " + String.join(" ", opts) + ">" + ds + "</TD>\n";
+        }else{
+            this.topStr += BSSForm.sp() + "<TD>" + ds + "</TD>\n";
+        }
         return this;
     }
 
     public BSSForm tableTdHtml( String s, String... opts ){
-        this.topStr += BSSForm.sp() + "<TD" + String.join(" ", opts) + ">" + s + "</TD>\n";
+        if ( opts.length > 0 ){
+            this.topStr += BSSForm.sp() + "<TD " + String.join(" ", opts) + ">" + s + "</TD>\n";
+        }else{
+            this.topStr += BSSForm.sp() + "<TD>" + s + "</TD>\n";
+        }
         return this;
     }
 }

@@ -1,8 +1,11 @@
 package jp.d77.java.mail_filter_editor.Pages;
 
+import java.time.LocalDate;
+
 import jp.d77.java.mail_filter_editor.BasicIO.BSOpts;
 import jp.d77.java.mail_filter_editor.BasicIO.BSSForm;
 import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
+import jp.d77.java.mail_filter_editor.BasicIO.ToolDate;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
 import jp.d77.java.mail_filter_editor.Datas.BlackList;
 import jp.d77.java.mail_filter_editor.Datas.BlackListData;
@@ -59,7 +62,27 @@ public class WebBlockEditor extends AbstractWebPage implements InterfaceWebPage{
             if ( this.m_config.getMethod( "edit_select_cidr" ).isPresent() ){
                 this.m_black_list.remove( this.m_config.getMethod( "edit_select_cidr" ).get() );
             }
+        }else if ( this.m_config.getMethod( "submit_new_add" ).isPresent() ){
+            String ymd, cc, cidr, org;
+            if ( this.m_config.getMethod( "edit_new_ymd" ).isPresent() ) ymd = this.m_config.getMethod( "edit_new_ymd" ).get();
+            else ymd = ToolDate.Fromat( LocalDate.now() , "uuuuMMdd" );
+            if ( this.m_config.getMethod( "edit_new_cc" ).isPresent() ) cc = this.m_config.getMethod( "edit_new_cc" ).get();
+            else cc = "";
+            if ( this.m_config.getMethod( "edit_new_cidr" ).isPresent() ) cidr = this.m_config.getMethod( "edit_new_cidr" ).get();
+            else cidr = "";
+            if ( this.m_config.getMethod( "edit_new_org" ).isPresent() ) org = this.m_config.getMethod( "edit_new_org" ).get();
+            else org = "";
+            if ( this.m_black_list.findBlackListData(cidr).isPresent() ){
+                // 登録済み
+                this.m_config.alertError.addStringBr( "登録済みです:" + cidr );
+            }else{
+                BlackListData bld = this.m_black_list.getNewData();
+                bld.set( cidr, ymd, cc, org );
+                this.m_black_list.setUpdate();
+                this.m_config.alertInfo.addStringBr( "登録しました:" + cidr );
+            }
         }
+        
         this.m_black_list.save();
     }
 
@@ -123,15 +146,12 @@ public class WebBlockEditor extends AbstractWebPage implements InterfaceWebPage{
 
     private void dispTable(){
         if ( this.m_black_list == null ) return;
-                BSSForm f = BSSForm.newForm();
+        BSSForm f = BSSForm.newForm();
+
+        // Top
         f.formTop( this.m_config.Uri, false);
-        f.tableTop(
-            new BSOpts()
-                .id( "mfe-table")
-                .fclass("table table-bordered table-striped")
-                .border("1")
-            );
         
+        // Command buttons
         f.divRowTop();
 
         f.divTop(2 );
@@ -150,12 +170,81 @@ public class WebBlockEditor extends AbstractWebPage implements InterfaceWebPage{
         f.divBtm(6 );
         f.divRowBtm();
 
+        // New Form
+        f.divRowTop();
+        f.divTop(2 );   f.formLabel( BSOpts.init( "label", "YYYYMMDD" ) );  f.divBtm(2 );
+        f.divTop(2 );   f.formLabel( BSOpts.init( "label", "CC" ) );  f.divBtm(2 );
+        f.divTop(2 );   f.formLabel( BSOpts.init( "label", "CIDR" ) );  f.divBtm(2 );
+        f.divTop(2 );   f.formLabel( BSOpts.init( "label", "Organization" ) );  f.divBtm(2 );
+        f.divTop(4 );   f.formLabel( BSOpts.init( "label", "ADD" ) );  f.divBtm(4 );
+        f.divRowBtm();
+
+        String ymd, cc, cidr, org;
+        if ( this.m_config.getMethod( "edit_new_ymd" ).isPresent() ) ymd = this.m_config.getMethod( "edit_new_ymd" ).get();
+        else ymd = ToolDate.Fromat( LocalDate.now() , "uuuuMMdd" );
+        if ( this.m_config.getMethod( "edit_new_cc" ).isPresent() ) cc = this.m_config.getMethod( "edit_new_cc" ).get();
+        else cc = "";
+        if ( this.m_config.getMethod( "edit_new_cidr" ).isPresent() ) cidr = this.m_config.getMethod( "edit_new_cidr" ).get();
+        else cidr = "";
+        if ( this.m_config.getMethod( "edit_new_org" ).isPresent() ) org = this.m_config.getMethod( "edit_new_org" ).get();
+        else org = "";
+
+        f.divRowTop();
+        f.divTop(2 );
+        f.formInput(
+            BSOpts.init( "type", "text" )
+                .set( "name", "edit_new_ymd")
+                .value( ymd )
+            );
+        f.divBtm(2 );
+
+        f.divTop(2 );
+        f.formInput(
+            BSOpts.init( "type", "text" )
+                .set( "name", "edit_new_cc")
+                .set( "value", cc)
+            );
+        f.divBtm(2 );
+
+        f.divTop(2 );
+        f.formInput(
+            BSOpts.init( "type", "text" )
+                .set( "name", "edit_new_cidr")
+                .set( "value", cidr)
+            );
+        f.divBtm(2 );
+        
+        f.divTop(2 );
+        f.formInput(
+            BSOpts.init( "type", "text" )
+                .set( "name", "edit_new_org")
+                .set( "value", org)
+            );
+        f.divBtm(2 );
+
+        f.divTop(4 );
+        f.formSubmit(
+            BSOpts.init( "name", "submit_new_add" )
+                .set( "value", "submit_new_add")
+                .set("label", "ADD")
+            );
+        f.divBtm(4 );
+        f.divRowBtm();
+
+        f.tableTop(
+            new BSOpts()
+                .id( "mfe-table")
+                .fclass("table table-bordered table-striped")
+                .border("1")
+            );
+
+        // Table header
         f.tableHeadTop();
-        f.tableRowTh( "CMD", "YMD", "CC", "CIDR", "Organization");
+        f.tableRowTh( "CMD", "YMD", "CC", "CIDR", "Organization", "Parent");
         f.tableHeadBtm();
      
+        // Table body
         f.tableBodyTop();
-
         for ( BlackListData bld: this.m_black_list.getDatas() ){
             String opt = "";
             if ( ! bld.isEnable() ) opt = " style=\"background-color: #CCCCCC;\"";
@@ -183,6 +272,9 @@ public class WebBlockEditor extends AbstractWebPage implements InterfaceWebPage{
 
             // Org
             f.tableTd( bld.getOrg().orElse( "-" ), opt );
+
+            // Parent
+            f.tableTd( bld.getDuplicateCidr().orElse( "-" ), opt );
 
             f.tableRowBtm();
         }

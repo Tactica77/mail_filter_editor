@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.0</version>
+		<version>3.5.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>jp.d77.java</groupId>
 	<artifactId>mail_filter_editor</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.8.0</version>
 	<name>mail_filter_editor</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>

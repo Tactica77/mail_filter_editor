@@ -8,6 +8,7 @@ import jp.d77.java.mail_filter_editor.BasicIO.ToolDate;
 
 public class BlockData {
     public ArrayList<LocalDateTime> m_datetime = new ArrayList<LocalDateTime>();
+    public ArrayList<String>    m_blocked = new ArrayList<String>();
     public String    m_ip;
     public String    m_range;
     public ArrayList<String>    m_error_codes = new ArrayList<String>();
@@ -17,6 +18,13 @@ public class BlockData {
     public String    m_to;
     public String    m_org;
     public Integer   m_count = 0;
+
+    public boolean matchBlockCondition( String match_str ){
+        for( String s: this.m_blocked ){
+            if ( s.contains(match_str) ) return true;
+        }
+        return false;
+    }
 
     public void countup(){
         this.m_count++;
@@ -28,7 +36,7 @@ public class BlockData {
 
     public Optional<String> getDate(){
         if ( this.m_datetime.size() <= 0 ) Optional.empty();
-        return Optional.ofNullable( ToolDate.Fromat( this.m_datetime.get(0).toLocalDate(), "MM-dd" ) );
+        return Optional.ofNullable( ToolDate.Fromat( this.m_datetime.get(0).toLocalDate(), "uuuuMMdd" ) );
     }
 
     public Optional<String> getIp(){

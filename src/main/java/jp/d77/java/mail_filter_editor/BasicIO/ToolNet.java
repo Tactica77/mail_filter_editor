@@ -246,4 +246,52 @@ public class ToolNet {
             return List.of(new String[0]);
         }
     }
+
+    /**
+     * 片方のCIDRがもう片方の範囲かを判定し、範囲の広い方を返す。範囲に含まれない場合はempty
+     * @param cidrA
+     * @param cidrB
+     * @return 広い方の範囲を返す。完全一致の場合はcidrAを返します
+     */
+    public static Optional<String> isWithinCIDR(String cidrA, String cidrB) {
+        String[] aParts = cidrA.split("/");
+        String[] bParts = cidrB.split("/");
+
+        try {
+            int prefixA,prefixB;
+            if ( aParts.length <= 1 ){
+                prefixA = 32;
+            }else{
+                prefixA = Integer.parseInt(aParts[1]);
+            }
+            if ( bParts.length <= 1 ){
+                prefixB = 32;
+            }else{
+                prefixB = Integer.parseInt(bParts[1]);
+            }
+
+            long ipA = ipToLong(aParts[0]);
+            long ipB = ipToLong(bParts[0]);
+
+            long networkA = ipA & maskBits(prefixA);
+            long networkB = ipB & maskBits(prefixB);
+
+            // BがAに含まれる
+            if (prefixB >= prefixA && (ipB & maskBits(prefixA)) == networkA) {
+                return Optional.of(cidrA);
+            }
+            // AがBに含まれる
+            if (prefixA >= prefixB && (ipA & maskBits(prefixB)) == networkB) {
+                return Optional.of(cidrB);
+            }
+            return Optional.empty();
+        } catch (Exception e) {
+            Debugger.LogPrint( "cmp error: " + cidrA + " " + cidrB + " " + e.getMessage() );
+            return Optional.empty();
+        }
+    }
+
+    private static long maskBits(int prefix) {
+        return ~((1L << (32 - prefix)) - 1) & 0xFFFFFFFFL;
+    }
 }

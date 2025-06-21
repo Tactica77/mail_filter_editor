@@ -34,6 +34,16 @@ public class BlackList {
         return this.m_datas;
     }
 
+    public BlackListData getNewData(){
+        BlackListData bld = new BlackListData();
+        this.m_datas.add(bld);
+        return bld;
+    }
+
+    public void setUpdate(){
+        this.m_isUpdate = true;
+    }
+
     /**
      * 指定のCIDRデータを検索する
      * @param cidr
@@ -138,6 +148,13 @@ public class BlackList {
             e.printStackTrace();
             this.m_config.alertError.addStringBr( "ブラックリストの読み込みに失敗しました:" + filename + " e=" + e.getMessage() );
             return false;
+        }
+
+        for ( BlackListData t_bld: this.m_datas ){
+            for ( BlackListData c_bld: this.m_datas ){
+                if ( t_bld.getCidr().equals( c_bld.getCidr() ) ) continue;
+                t_bld.checkDuplicateCidr( c_bld.getCidr() );
+            }
         }
 
         return true;

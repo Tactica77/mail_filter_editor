@@ -23,6 +23,7 @@ import jp.d77.java.mail_filter_editor.Pages.WebWhois;
 public class MailFilterEditorMain {
     @RequestMapping("/")  // ルートへこのメソッドをマップする
     public String mail_filter_editor( HttpServletRequest request ) {
+        Debugger.startTimer();
         Debugger.LogPrint( "------ START ------" );
 
         // 表示用クラスの設定
@@ -53,6 +54,7 @@ public class MailFilterEditorMain {
 
     @RequestMapping("/block_editor")  // ルートへこのメソッドをマップする
     public String BlockEditor( HttpServletRequest request ) {
+        Debugger.startTimer();
         Debugger.LogPrint( "------ START ------" );
 
         // 表示用クラスの設定
@@ -88,6 +90,7 @@ public class MailFilterEditorMain {
 
     @RequestMapping("/whois")  // ルートへこのメソッドをマップする
     public String whois( HttpServletRequest request ) {
+        Debugger.startTimer();
         Debugger.LogPrint( "------ START ------" );
 
         // 表示用クラスの設定
@@ -101,6 +104,7 @@ public class MailFilterEditorMain {
 
     @RequestMapping("/subnets")  // ルートへこのメソッドをマップする
     public String subnets( HttpServletRequest request ) {
+        Debugger.startTimer();
         Debugger.LogPrint( "------ START ------" );
 
         // 表示用クラスの設定

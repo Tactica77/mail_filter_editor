@@ -1,17 +1,23 @@
 package jp.d77.java.mail_filter_editor.Pages;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import jp.d77.java.mail_filter_editor.BasicIO.BSOpts;
 import jp.d77.java.mail_filter_editor.BasicIO.BSSForm;
 import jp.d77.java.mail_filter_editor.Datas.BlockData;
 import jp.d77.java.mail_filter_editor.Datas.BlockedDatas;
+import jp.d77.java.mail_filter_editor.Datas.IptablesLog;
+import jp.d77.java.mail_filter_editor.Datas.IptablesLog.IptablesLogData;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
 import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
+import jp.d77.java.mail_filter_editor.BasicIO.HtmlString;
 import jp.d77.java.mail_filter_editor.BasicIO.ToolDate;
+import jp.d77.java.mail_filter_editor.BasicIO.ToolNet;
 
 public class WebTop extends AbstractWebPage implements InterfaceWebPage{
-    private BlockedDatas m_datas;
+    private BlockedDatas    m_datas;
+    private IptablesLog     m_iptables_log;
 
     public WebTop(WebConfig cfg) {
         super(cfg);
@@ -30,6 +36,7 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
      */
     @Override
     public void load() {
+        // 表示範囲終
         LocalDate endDate =
             ToolDate.YMD2LocalDate(
                 this.m_config.getMethod( "edit_date" ).orElse( 
@@ -37,24 +44,58 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
                 )
              ).orElse( LocalDate.now() );
         
+        // 表示範囲始
         LocalDate startDate = endDate.plusDays( Integer.parseInt( this.m_config.getMethod( "edit_days" ).orElse("7") ) * (-1) );
-        this.m_datas = new BlockedDatas( this.m_config );
 
+        // 初期化～読み込み
+        this.m_datas = new BlockedDatas( this.m_config );
         boolean result = false;
         this.m_datas.init();
-        for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1)) {
-            if ( this.m_datas.load( date ) ) result = true;
-        }
-        this.m_datas.createData();
 
-        if ( ! result ){
-            this.m_datas = null;
+        LocalDate date = startDate;
+        int cnt = 0;
+        while ( true ) {
+            if ( this.m_datas.load( date ) ) result = true;
+            if ( ! date.isBefore(endDate) ) break;
+            date = date.plusDays(1);
+            if ( cnt >= 30 ) break;
+            cnt++;
         }
+        if ( ! result ) this.m_datas = null;    // 読み込み失敗
+        else{
+            // スコア計算
+            this.m_datas.createScore();
+        }
+
+        if ( this.m_datas != null ){
+            // iptables読み込み
+            this.m_iptables_log = new IptablesLog( this.m_config );
+            if ( this.m_iptables_log.load() == false ){
+                this.m_iptables_log = null;
+            }
+        }
+
+        // block状態確認
+        for ( String idx: this.m_datas.getDatas().keySet() ){
+            BlockData bd = this.m_datas.getDatas().get( idx );
+            if ( bd.getIp().isEmpty() ) continue;
+            int a = this.m_iptables_log.ClassA( bd.getIp().get() );
+
+            for ( IptablesLogData ipt: this.m_iptables_log.getDatas() ){
+                if ( a != ipt.getClassA() ) continue;
+                if ( ToolNet.isWithinCIDR( ipt.getCidr().orElse("-") , bd.getIp().get() ).orElse("-").equals( ipt.getCidr().orElse("-") ) ){
+                    bd.m_blocked.add( ipt.getCidr().orElse( "-" ) + "<BR>" + ipt.getCode().orElse("-") );
+                }
+            }
+        }
+
         this.m_config.alertInfo.addStringBr( startDate + "から" + endDate + "まで表示します。" );
         this.m_config.alertInfo.addStringBr( "(W)...whois検索" );
         this.m_config.alertInfo.addStringBr( "(S)...subnet一覧表示" );
+        this.m_config.alertInfo.addStringBr( "450...Sender address rejected: Domain not found" );
+        this.m_config.alertInfo.addStringBr( "550...User unknown" );
 
-        //this.m_datas.save( LocalDate.of( 2025, 6, 14 ) );
+
     }
 
     /**
@@ -201,8 +242,10 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
         f.tableTh( "IP" );
         f.tableTh( "Code" );
         f.tableTh( "Date" );
-        f.tableTh( "Cnt" );
-        f.tableTh( "Score" );
+        f.tableTh( "C" );
+        f.tableTh( "R" );
+        f.tableTh( "O" );
+        //f.tableTh( "Score" );
         f.tableTh( "From->To" );
         f.tableTh( "Org" );
         f.tableRowBtm();
@@ -211,22 +254,32 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
         f.tableBodyTop();
         String link;
 
-        String col1day = ToolDate.Fromat( LocalDate.now(), "MM-dd" );
-        String col2day = ToolDate.Fromat( LocalDate.now().plusDays( -1 ), "MM-dd" );
-        String col3day = ToolDate.Fromat( LocalDate.now().plusDays( -2 ), "MM-dd" );
+        String col1day = ToolDate.Fromat( LocalDate.now(), "uuuuMMdd" );
+        String col2day = ToolDate.Fromat( LocalDate.now().plusDays( -1 ), "uuuuMMdd" );
+        String col3day = ToolDate.Fromat( LocalDate.now().plusDays( -2 ), "uuuuMMdd" );
 
         for ( String idx: this.m_datas.getDatas().keySet() ){
             BlockData bd = this.m_datas.getDatas().get( idx );
+            String add_opt = "";
+
+            if ( bd.matchBlockCondition( "black_list" ) ){
+                add_opt = "style=\"background-color: #cccccc;\"";
+            }
+
             f.tableRowTop();
 
             // Blocked
-            f.tableTd( "-" );
+            if ( bd.m_blocked.size() <= 0 ){
+                f.tableTd( "-", add_opt );
+            }else{
+                f.tableTdHtml( String.join("<BR>", bd.m_blocked ), add_opt );
+            }
 
             // CC
-            f.tableTd( bd.getCc().orElse("-") );
+            f.tableTd( bd.getCc().orElse("-"), add_opt );
 
             // Range
-            f.tableTd( bd.getRange().orElse("-") );
+            f.tableTdHtml( this.BlockLink( bd.getRange().orElse("-"), bd.getCc().orElse(""), bd.getOrg().orElse("") ), add_opt );
 
             // IP
             link = "";
@@ -235,38 +288,52 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
                 link = "<A Href=\"/whois?ip=" + bd.getIp().get() + "\" target=\"_blank\">(W)</A>"
                 + "<A Href=\"/subnets?ip=" + bd.getIp().get() + "\" target=\"_blank\">(S)</A>";
             }
-            f.tableTdHtml( bd.getIp().orElse("-") + link );
+            f.tableTdHtml( this.BlockLink( bd.getIp().orElse(""), bd.getCc().orElse(""), bd.getOrg().orElse("") ) + link, "nowrap", add_opt );
 
             // Code
-            f.tableTd( String.join(",", bd.getErrorCodes() ) );
+            f.tableTdHtml( String.join("<BR>", bd.getErrorCodes() ), add_opt );
 
             // Date
             if ( bd.getDate().orElse( "-" ).equals( col1day ) ){
-                f.tableTd( bd.getDate().orElse( "-" ), " style=\"background-color: #ffff00;\"" );
+                f.tableTd( bd.getDate().orElse( "-" ), "style=\"background-color: #ffff00;\"" );
             }else if ( bd.getDate().orElse( "-" ).equals( col2day ) ){
-                f.tableTd( bd.getDate().orElse( "-" ), " style=\"background-color: #ffff88;\"" );
+                f.tableTd( bd.getDate().orElse( "-" ), "style=\"background-color: #ffff88;\"" );
             }else if ( bd.getDate().orElse( "-" ).equals( col3day ) ){
-                f.tableTd( bd.getDate().orElse( "-" ), " style=\"background-color: #ffffcc;\"" );
+                f.tableTd( bd.getDate().orElse( "-" ), "style=\"background-color: #ffffcc;\"" );
             }else{
-                f.tableTd( bd.getDate().orElse( "-" ) );
+                f.tableTd( bd.getDate().orElse( "-" ), add_opt );
             }
 
-            // Cnt
-            f.tableTd( bd.getCount() + "" );
+            // C
+            f.tableTd( bd.getCount() + "", add_opt );
+
+            // R
+            f.tableTd( this.m_datas.getCountRange( bd.getRange().orElse("-") ) + "", add_opt );
+
+            // R
+            f.tableTd( this.m_datas.getCountOrg( bd.getOrg().orElse("-") ) + "", add_opt );
 
             // Score
-            f.tableTd( this.m_datas.getScore( bd.getIp().get(), bd.getRange().orElse("-"), bd.getOrg().orElse("-") ) );
+//            f.tableTd( this.m_datas.getScore( bd.getIp().get(), bd.getRange().orElse("-"), bd.getOrg().orElse("-") ) );
 
             // From To
-            f.tableTd( String.join(" ", bd.getFromTo() ) );
+            f.tableTd( String.join(" ", bd.getFromTo() ), add_opt );
 
             // Org
-            f.tableTd( bd.getOrg().orElse("-") );
+            f.tableTd( bd.getOrg().orElse("-"), add_opt );
 
             f.tableRowBtm();
         }
         f.tableBodyBtm();
         f.tableBtm();
         this.m_html.addString( f.toString() );
+    }
+
+    private String BlockLink( String cidr, String cc, String org ){
+        ArrayList<String> res = new ArrayList<String>();
+        if ( cc != null && ! cc.isEmpty() ) res.add( "edit_new_cc=" + HtmlString.HtmlEscape( cc ) );
+        if ( cidr != null && ! cidr.isEmpty() ) res.add( "edit_new_cidr=" + HtmlString.HtmlEscape( cidr ) );
+        if ( org != null && ! org.isEmpty() ) res.add( "edit_new_org=" + HtmlString.HtmlEscape( org ) );
+        return "<A Href=\"/block_editor?" + String.join("&", res) + "\" target=\"blank\">" + cidr + "</A>";
     }
 }

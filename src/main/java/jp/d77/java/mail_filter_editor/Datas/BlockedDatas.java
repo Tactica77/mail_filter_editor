@@ -144,7 +144,10 @@ public class BlockedDatas {
         return true;
     }
 
-    public void createData(){
+    /**
+     * スコアを作成
+     */
+    public void createScore(){
         this.m_datas = new HashMap<String,BlockData>();
 
         for ( String YMD: this.m_filedatas.keySet() ){
@@ -195,15 +198,23 @@ public class BlockedDatas {
 
     public String getScore( String ip, String cidr, String org ){
         String ret = "";
-        if ( ip.equals("") || ip.equals("-") || !this.m_score_i.containsKey(ip) ) ret += "I:0";
-        else ret += "I:" + this.m_score_i.get(ip);
+        //if ( ip.equals("") || ip.equals("-") || !this.m_score_i.containsKey(ip) ) ret += "cnt:0";
+        //else ret += "cnt:" + this.m_score_i.get(ip);
 
-        if ( org.equals("") || org.equals("-") || !this.m_score_o.containsKey(org) ) ret += " O:0";
-        else ret += " O:" + this.m_score_o.get(org);
+        if ( org.equals("") || org.equals("-") || !this.m_score_o.containsKey(org) ) ret += "O:0";
+        else ret += "O:" + this.m_score_o.get(org);
 
         if ( cidr.equals("") || cidr.equals("-") || !this.m_score_r.containsKey(cidr) ) ret += " R:0";
         else ret += " R:" + this.m_score_r.get(cidr);
         return ret;
+    }
+
+    public Integer getCountRange( String key ){
+        return this.m_score_r.get(key);
+    }
+
+    public Integer getCountOrg( String key ){
+        return this.m_score_o.get(key);
     }
 
     private void countScore( String type, String key ){
