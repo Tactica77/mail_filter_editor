@@ -27,6 +27,10 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
     @Override
     public void init() {
         this.m_config.setPageTitle( this.m_config.getPageTitle() + " - Top" );
+        this.m_config.alertInfo.addStringBr( "(W)...whois検索" );
+        this.m_config.alertInfo.addStringBr( "(S)...subnet一覧表示" );
+        this.m_config.alertInfo.addStringBr( "450...Sender address rejected: Domain not found" );
+        this.m_config.alertInfo.addStringBr( "550...User unknown" );
     }
 
     /**
@@ -86,14 +90,7 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
                 }
             }
         }
-
         this.m_config.alertInfo.addStringBr( startDate + "から" + endDate + "まで表示します。" );
-        this.m_config.alertInfo.addStringBr( "(W)...whois検索" );
-        this.m_config.alertInfo.addStringBr( "(S)...subnet一覧表示" );
-        this.m_config.alertInfo.addStringBr( "450...Sender address rejected: Domain not found" );
-        this.m_config.alertInfo.addStringBr( "550...User unknown" );
-
-
     }
 
     /**
@@ -125,7 +122,6 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
     @Override
     public void displayNavbar() {
         Debugger.TracePrint();
-        
         SharedWebLib.Navbar( this.m_config, this.m_html );
     }
 

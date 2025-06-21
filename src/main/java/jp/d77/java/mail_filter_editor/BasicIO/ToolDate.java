@@ -75,6 +75,20 @@ public class ToolDate {
     }
 
     /**
+     * 文字列からLocalTimeへ変換。
+     * @param timeStr
+     * @return
+     */
+    public static Optional<LocalTime> Str2LocalTime(String timeStr) {
+        try {
+            LocalTime time = LocalTime.parse(timeStr);
+            return Optional.ofNullable( time );
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
      * 文字列からLocalDateへ変換。yyyy/MM/dd、yyyy年M月d日、yyyy-MM-dd -> yyyy-MM-dd
      * 日が無い場合は01日を補完する
      * @param originalDate
