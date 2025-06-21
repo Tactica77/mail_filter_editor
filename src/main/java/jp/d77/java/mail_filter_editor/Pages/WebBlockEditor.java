@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import jp.d77.java.mail_filter_editor.BasicIO.BSOpts;
 import jp.d77.java.mail_filter_editor.BasicIO.BSSForm;
 import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
+import jp.d77.java.mail_filter_editor.BasicIO.HtmlString;
 import jp.d77.java.mail_filter_editor.BasicIO.ToolDate;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
 import jp.d77.java.mail_filter_editor.Datas.BlackList;
@@ -190,6 +191,8 @@ public class WebBlockEditor extends AbstractWebPage implements InterfaceWebPage{
         else org = "";
 
         f.divRowTop();
+
+        // YYYYMMDD
         f.divTop(2 );
         f.formInput(
             BSOpts.init( "type", "text" )
@@ -198,6 +201,7 @@ public class WebBlockEditor extends AbstractWebPage implements InterfaceWebPage{
             );
         f.divBtm(2 );
 
+        // CC
         f.divTop(2 );
         f.formInput(
             BSOpts.init( "type", "text" )
@@ -206,6 +210,7 @@ public class WebBlockEditor extends AbstractWebPage implements InterfaceWebPage{
             );
         f.divBtm(2 );
 
+        // CIDR
         f.divTop(2 );
         f.formInput(
             BSOpts.init( "type", "text" )
@@ -214,6 +219,7 @@ public class WebBlockEditor extends AbstractWebPage implements InterfaceWebPage{
             );
         f.divBtm(2 );
         
+        // Organization
         f.divTop(2 );
         f.formInput(
             BSOpts.init( "type", "text" )
@@ -222,6 +228,7 @@ public class WebBlockEditor extends AbstractWebPage implements InterfaceWebPage{
             );
         f.divBtm(2 );
 
+        // ADD button
         f.divTop(4 );
         f.formSubmit(
             BSOpts.init( "name", "submit_new_add" )
@@ -268,7 +275,7 @@ public class WebBlockEditor extends AbstractWebPage implements InterfaceWebPage{
             f.tableTd( bld.getCountryCode().orElse( "-" ), opt );
 
             // CIDR
-            f.tableTd( bld.getCidr(), opt );
+            f.tableTdHtml( HtmlString.HtmlEscape( bld.getCidr() ) + SharedWebLib.linkWhois( bld.getCidr() ) + SharedWebLib.linkSubnets( bld.getCidr() ), opt );
 
             // Org
             f.tableTd( bld.getOrg().orElse( "-" ), opt );

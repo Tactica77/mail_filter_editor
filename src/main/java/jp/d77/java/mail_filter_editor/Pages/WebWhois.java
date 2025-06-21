@@ -91,7 +91,7 @@ public class WebWhois extends AbstractWebPage implements InterfaceWebPage{
         if ( this.m_whois.getResult().containsKey( "sp_cidr" ) ){
             f.tableRowTop();
             f.tableTh( "CIDR" );
-            f.tableTd( String.join(",", this.m_whois.getResult().get( "sp_cidr" ) ) );
+            f.tableTdHtml( String.join(",", SharedWebLib.linkIpBasic( this.m_whois.getResult().get( "sp_cidr" ).toArray( new String[0] ) ) ) );
             f.tableRowBtm();
         }
         if ( this.m_whois.getResult().containsKey( "sp_country" ) ){

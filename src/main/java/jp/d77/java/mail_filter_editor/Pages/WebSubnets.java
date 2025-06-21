@@ -116,10 +116,10 @@ public class WebSubnets extends AbstractWebPage implements InterfaceWebPage{
                 rir = whois.getRIR().orElse("-");
             }
 
-            f.tableTd( cidr );
+            f.tableTdHtml( SharedWebLib.linkBlockEditor(cidr, cc, org) );
 
             // CC
-            f.tableTd(cc );
+            f.tableTd( cc );
 
             // ORG NAME
             f.tableTd( org );

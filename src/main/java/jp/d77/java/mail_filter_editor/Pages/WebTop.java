@@ -1,7 +1,6 @@
 package jp.d77.java.mail_filter_editor.Pages;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 import jp.d77.java.mail_filter_editor.BasicIO.BSOpts;
 import jp.d77.java.mail_filter_editor.BasicIO.BSSForm;
@@ -11,7 +10,6 @@ import jp.d77.java.mail_filter_editor.Datas.IptablesLog;
 import jp.d77.java.mail_filter_editor.Datas.IptablesLog.IptablesLogData;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
 import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
-import jp.d77.java.mail_filter_editor.BasicIO.HtmlString;
 import jp.d77.java.mail_filter_editor.BasicIO.ToolDate;
 import jp.d77.java.mail_filter_editor.BasicIO.ToolNet;
 
@@ -252,7 +250,6 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
         f.tableHeadBtm();
 
         f.tableBodyTop();
-        String link;
 
         String col1day = ToolDate.Fromat( LocalDate.now(), "uuuuMMdd" );
         String col2day = ToolDate.Fromat( LocalDate.now().plusDays( -1 ), "uuuuMMdd" );
@@ -279,16 +276,10 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
             f.tableTd( bd.getCc().orElse("-"), add_opt );
 
             // Range
-            f.tableTdHtml( this.BlockLink( bd.getRange().orElse("-"), bd.getCc().orElse(""), bd.getOrg().orElse("") ), add_opt );
+            f.tableTdHtml( SharedWebLib.linkBlockEditor( bd.getRange().orElse("-"), bd.getCc().orElse(""), bd.getOrg().orElse("") ), add_opt );
 
             // IP
-            link = "";
-            if ( bd.getIp().isPresent() ){
-                // whois link
-                link = "<A Href=\"/whois?ip=" + bd.getIp().get() + "\" target=\"_blank\">(W)</A>"
-                + "<A Href=\"/subnets?ip=" + bd.getIp().get() + "\" target=\"_blank\">(S)</A>";
-            }
-            f.tableTdHtml( this.BlockLink( bd.getIp().orElse(""), bd.getCc().orElse(""), bd.getOrg().orElse("") ) + link, "nowrap", add_opt );
+            f.tableTdHtml( SharedWebLib.linkBlockEditor( bd.getIp().orElse(""), bd.getCc().orElse(""), bd.getOrg().orElse("") ), "nowrap", add_opt );
 
             // Code
             f.tableTdHtml( String.join("<BR>", bd.getErrorCodes() ), add_opt );
@@ -327,13 +318,5 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
         f.tableBodyBtm();
         f.tableBtm();
         this.m_html.addString( f.toString() );
-    }
-
-    private String BlockLink( String cidr, String cc, String org ){
-        ArrayList<String> res = new ArrayList<String>();
-        if ( cc != null && ! cc.isEmpty() ) res.add( "edit_new_cc=" + HtmlString.HtmlEscape( cc ) );
-        if ( cidr != null && ! cidr.isEmpty() ) res.add( "edit_new_cidr=" + HtmlString.HtmlEscape( cidr ) );
-        if ( org != null && ! org.isEmpty() ) res.add( "edit_new_org=" + HtmlString.HtmlEscape( org ) );
-        return "<A Href=\"/block_editor?" + String.join("&", res) + "\" target=\"blank\">" + cidr + "</A>";
     }
 }
