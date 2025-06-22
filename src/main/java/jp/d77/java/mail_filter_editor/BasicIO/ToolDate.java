@@ -27,32 +27,32 @@ public class ToolDate {
      * @return 変換後の文字列。変換できない場合は「-」
      * @since 2025.06.16
      */
-    public static String Fromat(LocalDateTime input, String pattern ){
-        if (input == null) return "-";
+    public static Optional<String> Fromat(LocalDateTime input, String pattern ){
+        if (input == null) return Optional.empty();
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern( pattern );
-            return input.format(formatter);
+            return Optional.ofNullable( input.format(formatter) );
         }catch (IllegalArgumentException | DateTimeException e) {
             e.printStackTrace();
-            return "-";
+            return Optional.empty();
         }
     }
 
     /**
-     * LocalDateを指定の形式に変換する。変換できない場合は「-」を返す。
+     * LocalDateを指定の形式に変換する。
      * @param input 変換対象の文字列（YYYYMM形式）
      * @param pattern 結果パターン。uuuuMMdd、HH:mm:ssなど
-     * @return 変換後の文字列。変換できない場合は「-」
+     * @return 変換後の文字列。
      * @since 2025.06.15
      */
-    public static String Fromat(LocalDate input, String pattern ){
-        if (input == null) return "-";
+    public static Optional<String> Fromat(LocalDate input, String pattern ){
+        if (input == null) return Optional.empty();
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern( pattern );
-            return input.format(formatter);
+            return Optional.ofNullable( input.format(formatter) );
         }catch (IllegalArgumentException | DateTimeException e) {
             e.printStackTrace();
-            return "-";
+            return Optional.empty();
         }
     }
 
@@ -63,14 +63,14 @@ public class ToolDate {
      * @return 変換後の文字列。変換できない場合は「-」
      * @since 2025.06.15
      */
-    public static String Fromat(LocalTime input, String pattern ){
-        if (input == null) return "-";
+    public static Optional<String> Fromat(LocalTime input, String pattern ){
+        if (input == null) return Optional.empty();
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern( pattern );
-            return input.format(formatter);
+            return Optional.ofNullable( input.format(formatter) );
         }catch (IllegalArgumentException | DateTimeException e) {
             e.printStackTrace();
-            return "-";
+            return Optional.empty();
         }
     }
 

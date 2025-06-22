@@ -18,6 +18,7 @@ public class SharedWebLib {
         // Menu
         html.addString( BSS.getNavbarLinkItem( BSOpts.init().title("Block Editor").href("/block_editor") ) );
         html.addString( BSS.getNavbarLinkItem( BSOpts.init().title("Mail Log").href("/mail_log") ) );
+        html.addString( BSS.getNavbarLinkItem( BSOpts.init().title("IP Count").href("/mail_log?mode=ipcount") ) );
 
         html.addString( BSS.getNavbarFooter() );
     }
@@ -30,6 +31,8 @@ public class SharedWebLib {
      * @return
      */
     public static String linkBlockEditor( String cidr, String cc, String org ){
+        if ( cidr == null || cidr.isEmpty() || cidr.equals("-") ) return "-";
+
         ArrayList<String> res = new ArrayList<String>();
         if ( cc != null && ! cc.isEmpty() ) res.add( "edit_new_cc=" + HtmlString.HtmlEscape( cc ) );
         if ( cidr != null && ! cidr.isEmpty() ) res.add( "edit_new_cidr=" + HtmlString.HtmlEscape( cidr ) );
@@ -42,6 +45,8 @@ public class SharedWebLib {
     public static String[] linkIpBasic( String... ips ){
         ArrayList<String> ret = new ArrayList<String>();
         for( String ip: ips ){
+            if ( ip.isEmpty() ) continue;
+            if ( ip.equals("-") ) continue;
             ret.add( HtmlString.HtmlEscape( ip ) + SharedWebLib.linkWhois( ip ) + SharedWebLib.linkSubnets( ip ) );
         }
         return ret.toArray( new String[0] );

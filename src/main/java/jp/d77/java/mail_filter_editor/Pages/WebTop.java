@@ -42,7 +42,7 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
         LocalDate endDate =
             ToolDate.YMD2LocalDate(
                 this.m_config.getMethod( "edit_date" ).orElse( 
-                    ToolDate.Fromat( LocalDate.now(), "uuuu-MM-dd")
+                    ToolDate.Fromat( LocalDate.now(), "uuuu-MM-dd").orElse( "-")
                 )
              ).orElse( LocalDate.now() );
         
@@ -176,7 +176,7 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
                 BSOpts.init()
                 .type( "date")
                 .name( "edit_date")
-                .value( this.m_config.getMethod("edit_date").orElse( ToolDate.Fromat( LocalDate.now(), "uuuu-MM-dd") ))
+                .value( this.m_config.getMethod("edit_date").orElse( ToolDate.Fromat( LocalDate.now(), "uuuu-MM-dd").orElse("-") ))
             )
         .divBtm(2);
 
@@ -247,9 +247,9 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
 
         f.tableBodyTop();
 
-        String col1day = ToolDate.Fromat( LocalDate.now(), "uuuuMMdd" );
-        String col2day = ToolDate.Fromat( LocalDate.now().plusDays( -1 ), "uuuuMMdd" );
-        String col3day = ToolDate.Fromat( LocalDate.now().plusDays( -2 ), "uuuuMMdd" );
+        String col1day = ToolDate.Fromat( LocalDate.now(), "uuuuMMdd" ).orElse( "-" );
+        String col2day = ToolDate.Fromat( LocalDate.now().plusDays( -1 ), "uuuuMMdd" ).orElse( "-" );
+        String col3day = ToolDate.Fromat( LocalDate.now().plusDays( -2 ), "uuuuMMdd" ).orElse( "-" );
 
         for ( String idx: this.m_datas.getDatas().keySet() ){
             BlockData bd = this.m_datas.getDatas().get( idx );

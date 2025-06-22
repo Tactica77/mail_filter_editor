@@ -14,6 +14,10 @@ import java.util.Optional;
 public class ToolNet {
     private static HashMap<String, WhoisResult> whois_result = new HashMap<String, WhoisResult>();
 
+    public static boolean isWhoisCached( String ipAddress ){
+        return ToolNet.whois_result.containsKey(ipAddress);
+    }
+    
     public static Optional<WhoisResult> getWhois( String ipAddress ){
         // キャッシュを返す
         if ( ToolNet.whois_result.containsKey(ipAddress) ) return Optional.ofNullable( ToolNet.whois_result.get(ipAddress) );

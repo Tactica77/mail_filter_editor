@@ -46,8 +46,10 @@ public class BlockedDatas {
     }
 
     public boolean save( LocalDate target_date ){
-        String YM = ToolDate.Fromat( target_date, "uuuuMM" );
-        String YMD = ToolDate.Fromat( target_date, "uuuuMMdd" );
+        String YM = ToolDate.Fromat( target_date, "uuuuMM" ).orElse(null);
+        String YMD = ToolDate.Fromat( target_date, "uuuuMMdd" ).orElse(null);
+        if ( YM == null || YMD == null ) return false;
+        
         String filename = this.m_config.getDataFilePath() + "/log/" + YM + "/block_ip_" + YMD + ".log";
         File f_filename = new File( filename );
         Debugger.LogPrint( "file=" + filename );
@@ -86,8 +88,9 @@ public class BlockedDatas {
     }
 
     public boolean load( LocalDate target_date ){
-        String YM = ToolDate.Fromat( target_date, "uuuuMM" );
-        String YMD = ToolDate.Fromat( target_date, "uuuuMMdd" );
+        String YM = ToolDate.Fromat( target_date, "uuuuMM" ).orElse(null);
+        String YMD = ToolDate.Fromat( target_date, "uuuuMMdd" ).orElse(null);
+        if ( YM == null || YMD == null ) return false;
 
         String filename = this.m_config.getDataFilePath() + "/log/" + YM + "/block_ip_" + YMD + ".log";
         Debugger.LogPrint( "file=" + filename );

@@ -36,7 +36,7 @@ public class BlockData {
 
     public Optional<String> getDate(){
         if ( this.m_datetime.size() <= 0 ) Optional.empty();
-        return Optional.ofNullable( ToolDate.Fromat( this.m_datetime.get(0).toLocalDate(), "uuuuMMdd" ) );
+        return ToolDate.Fromat( this.m_datetime.get(0).toLocalDate(), "uuuuMMdd" );
     }
 
     public Optional<String> getIp(){

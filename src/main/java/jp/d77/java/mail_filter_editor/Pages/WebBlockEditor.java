@@ -66,7 +66,7 @@ public class WebBlockEditor extends AbstractWebPage implements InterfaceWebPage{
         }else if ( this.m_config.getMethod( "submit_new_add" ).isPresent() ){
             String ymd, cc, cidr, org;
             if ( this.m_config.getMethod( "edit_new_ymd" ).isPresent() ) ymd = this.m_config.getMethod( "edit_new_ymd" ).get();
-            else ymd = ToolDate.Fromat( LocalDate.now() , "uuuuMMdd" );
+            else ymd = ToolDate.Fromat( LocalDate.now() , "uuuuMMdd" ).orElse( "-" );
             if ( this.m_config.getMethod( "edit_new_cc" ).isPresent() ) cc = this.m_config.getMethod( "edit_new_cc" ).get();
             else cc = "";
             if ( this.m_config.getMethod( "edit_new_cidr" ).isPresent() ) cidr = this.m_config.getMethod( "edit_new_cidr" ).get();
@@ -182,7 +182,7 @@ public class WebBlockEditor extends AbstractWebPage implements InterfaceWebPage{
 
         String ymd, cc, cidr, org;
         if ( this.m_config.getMethod( "edit_new_ymd" ).isPresent() ) ymd = this.m_config.getMethod( "edit_new_ymd" ).get();
-        else ymd = ToolDate.Fromat( LocalDate.now() , "uuuuMMdd" );
+        else ymd = ToolDate.Fromat( LocalDate.now() , "uuuuMMdd" ).orElse( "-" );
         if ( this.m_config.getMethod( "edit_new_cc" ).isPresent() ) cc = this.m_config.getMethod( "edit_new_cc" ).get();
         else cc = "";
         if ( this.m_config.getMethod( "edit_new_cidr" ).isPresent() ) cidr = this.m_config.getMethod( "edit_new_cidr" ).get();

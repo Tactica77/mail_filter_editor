@@ -77,7 +77,8 @@ public class WebSubnets extends AbstractWebPage implements InterfaceWebPage{
         }else{
             this.m_html.addStringCr( HtmlString.h( 1, "ip=" + this.getConfig().getMethod("ip").get() ) );
         }
-        String ip = this.getConfig().getMethod("ip").get();
+        String a[] = this.getConfig().getMethod("ip").get().split( "/");
+        String ip = a[0];
         BSSForm f = BSSForm.newForm();
         f.tableTop("subnets_table");
 
