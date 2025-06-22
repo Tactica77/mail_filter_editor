@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>jp.d77.java</groupId>
 	<artifactId>mail_filter_editor</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<name>mail_filter_editor</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>

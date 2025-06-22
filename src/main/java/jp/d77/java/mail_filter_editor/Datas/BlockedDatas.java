@@ -18,7 +18,9 @@ import java.util.HashMap;
 
 import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
 import jp.d77.java.mail_filter_editor.BasicIO.ToolDate;
+import jp.d77.java.mail_filter_editor.BasicIO.ToolNet;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
+import jp.d77.java.mail_filter_editor.BasicIO.WhoisResult;
 
 public class BlockedDatas {
 //08:12:16<>198.163.193.63<>198.163.192.0/20<>code_550<>NL<>Sagawa-exp.lostari60@gzpp.com<>ml@d77.jp<>RIPE<>
@@ -94,6 +96,7 @@ public class BlockedDatas {
 
         String filename = this.m_config.getDataFilePath() + "/log/" + YM + "/block_ip_" + YMD + ".log";
         Debugger.LogPrint( "file=" + filename );
+        int whois_counter = 3;
         try (BufferedReader br = new BufferedReader(new FileReader( filename ))) {
             String line;
 
@@ -137,6 +140,26 @@ public class BlockedDatas {
 
                 // 7: org
                 if ( columns.length >= 8 ) d.m_org = columns[7];
+
+                if ( ( d.m_range == null || d.m_org == null || d.m_range.isEmpty() || d.m_org.isEmpty() ) && whois_counter >= 0 ){
+                    WhoisResult wr;
+                    if ( ! ToolNet.isWhoisCached( d.m_ip ) ){
+                        whois_counter--;
+                    }
+                    wr = ToolNet.getWhois( d.m_ip ).orElse( null );
+
+                    if ( wr != null ) {
+                        if ( wr.getResult().containsKey("sp_cidr") && wr.getResult().get("sp_cidr").size() > 0 ){
+                            d.m_range = wr.getResult().get("sp_cidr").get(0);
+                        }
+                        if ( wr.getResult().containsKey("sp_country") && wr.getResult().get("sp_country").size() > 0 ){
+                            d.m_country_code = wr.getResult().get("sp_country").get(0);
+                        }
+                        if ( wr.getResult().containsKey("sp_organization") && wr.getResult().get("sp_organization").size() > 0 ){
+                            d.m_org = wr.getResult().get("sp_organization").get(0);
+                        }
+                    }
+                }
             }
         } catch (FileNotFoundException e) {
         } catch (IOException e) {

@@ -114,7 +114,7 @@ public class WebSubnets extends AbstractWebPage implements InterfaceWebPage{
                 if ( whois.getResult().containsKey("sp_organization") ) org = whois.getResult().get("sp_organization").get(0);
                 else if ( whois.getResult().containsKey("sp_organization2") ) org = whois.getResult().get("sp_organization2").get(0);
                 else if ( whois.getResult().containsKey("sp_organization3") ) org = whois.getResult().get("sp_organization3").get(0);
-                rir = whois.getRIR().orElse("-");
+                rir = whois.getServer();
             }
 
             f.tableTdHtml( SharedWebLib.linkBlockEditor(cidr, cc, org) );

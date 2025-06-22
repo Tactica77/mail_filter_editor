@@ -28,7 +28,10 @@ public class WebWhois extends AbstractWebPage implements InterfaceWebPage{
     public void load() {
         if ( this.getConfig().getMethod("ip").isEmpty() ) return;
         this.m_whois = ToolNet.getWhois( this.getConfig().getMethod("ip").get() ).orElse( null );
-        if ( this.m_whois == null ) this.m_config.alertError.addStringBr( "whois error" );
+        if ( this.m_whois == null ) {
+            this.m_config.alertError.addStringBr( "whois error" );
+            return;
+        }
         if ( this.m_whois.getError().isPresent() ) this.m_config.alertError.addStringBr( "whois error:" + this.m_whois.getError().get() );
     }
 
@@ -85,7 +88,10 @@ public class WebWhois extends AbstractWebPage implements InterfaceWebPage{
             this.m_html.addStringCr( HtmlString.h( 1, "ip=" + this.getConfig().getMethod("ip").get() ) );
         }
         if ( this.m_whois == null ) return;
+
         BSSForm f = BSSForm.newForm();
+
+        // Results
         f.tableTop("whois_table");
         f.tableBodyTop();
         if ( this.m_whois.getResult().containsKey( "sp_cidr" ) ){
@@ -110,24 +116,23 @@ public class WebWhois extends AbstractWebPage implements InterfaceWebPage{
         f.tableBtm();
         this.m_html.addString( f.toString() );
 
+        // history
         f = BSSForm.newForm();
         f.tableTop("whois_table");
 
-        f.tableHeadTop();
-        f.tableRowTh("Whois Result");
-        f.tableHeadBtm();
+        WhoisResult wr = this.m_whois;
+        for ( int i = 0; i < 6; i ++ ) {
+            f.tableHeadTop();
+            f.tableRowTh( wr.getThisServer() );
+            f.tableHeadBtm();
 
-        f.tableBodyTop();
-        f.tableRowTd( this.m_whois.getWhoisResult() );
-        f.tableBodyBtm();
+            f.tableBodyTop();
+            f.tableRowTd( wr.getWhoisResult() );
+            f.tableBodyBtm();
 
-        f.tableHeadTop();
-        f.tableRowTh("IANA Result");
-        f.tableHeadBtm();
-
-        f.tableBodyTop();
-        f.tableRowTd( this.m_whois.getIanaResult() );
-        f.tableBodyBtm();
+            if ( wr.getChild().isEmpty() ) break;
+            wr = wr.getChild().get();
+        }
 
         f.tableBtm();
         this.m_html.addString( f.toString() );

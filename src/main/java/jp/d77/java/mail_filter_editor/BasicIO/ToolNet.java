@@ -1,10 +1,6 @@
 package jp.d77.java.mail_filter_editor.BasicIO;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,56 +17,13 @@ public class ToolNet {
     public static Optional<WhoisResult> getWhois( String ipAddress ){
         // キャッシュを返す
         if ( ToolNet.whois_result.containsKey(ipAddress) ) return Optional.ofNullable( ToolNet.whois_result.get(ipAddress) );
-
-        WhoisResult wr = new WhoisResult();
-        ToolNet.whois_result.put(ipAddress, wr);
-        wr.setIp(ipAddress);
-
-        Debugger.TracePrint();
-        String whoisServer = "whois.iana.org";
-
-        try (Socket socket = new Socket(whoisServer, 43);
-             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-
-            // まず、IANAでIPアドレスの割り当て先（RIR）を取得
-            out.println(ipAddress);
-
-            String line;
-            while ((line = in.readLine()) != null) {
-                wr.addIanaResult( line );
-                //System.out.println(line);
-                if (line.toLowerCase().startsWith("refer:")) {
-                    wr.setRIR( line.split(":")[1].trim() );
-                }
-            }
-            if (wr.getRIR().isEmpty() ) return Optional.empty();
-            
-            //System.out.println("\n--- 接続先 RIR: " + whoisRedirectServer + " ---\n");
-
-            // 取得したRIRに再度接続して詳細なWHOISを取得
-            try (Socket redirectSocket = new Socket( wr.getRIR().get(), 43);
-                    PrintWriter redirectOut = new PrintWriter(redirectSocket.getOutputStream(), true);
-                    BufferedReader redirectIn = new BufferedReader(new InputStreamReader(redirectSocket.getInputStream()))) {
-
-                redirectOut.println(ipAddress);
-
-                while ((line = redirectIn.readLine()) != null) {
-                    wr.addWhoisResult( line );
-                    //System.out.println(line);
-                }
-            }
-
-            //System.out.println( wr.getWhoisResult() );
-            //wr.dump();
-            Debugger.LogPrint( "IP=" + ipAddress + " RIR=" + wr.getRIR().orElse("-") );
-            return Optional.ofNullable( wr );
-        } catch (Exception e) {
-            wr.setError( e );
-            e.printStackTrace();
-            return Optional.ofNullable( wr );
+        ToolNet.whois_result.put(ipAddress, new WhoisResult() );
+        if ( ToolNet.whois_result.get( ipAddress ).requestWhois( ipAddress ) ){
+            return Optional.ofNullable( ToolNet.whois_result.get(ipAddress) );
+        }else{
+            ToolNet.whois_result.remove( ipAddress );
+            return Optional.empty();
         }
-
     }
 
     /**
