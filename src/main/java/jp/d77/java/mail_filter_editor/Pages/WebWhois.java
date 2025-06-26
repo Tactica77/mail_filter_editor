@@ -55,6 +55,7 @@ public class WebWhois extends AbstractWebPage implements InterfaceWebPage{
     @Override
     public void displayHeader(){
         super.displayHeader();
+        this.m_html.addString(BSSForm.getTableHeader( "mfe" ));
     }
 
     /**

@@ -4,8 +4,8 @@ import java.time.LocalDate;
 
 import jp.d77.java.mail_filter_editor.BasicIO.BSOpts;
 import jp.d77.java.mail_filter_editor.BasicIO.BSSForm;
-import jp.d77.java.mail_filter_editor.Datas.BlockData;
-import jp.d77.java.mail_filter_editor.Datas.BlockedDatas;
+import jp.d77.java.mail_filter_editor.Datas.BlockHistryData;
+import jp.d77.java.mail_filter_editor.Datas.BlockHistry;
 import jp.d77.java.mail_filter_editor.Datas.IptablesLog;
 import jp.d77.java.mail_filter_editor.Datas.IptablesLog.IptablesLogData;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
@@ -14,7 +14,7 @@ import jp.d77.java.mail_filter_editor.BasicIO.ToolDate;
 import jp.d77.java.mail_filter_editor.BasicIO.ToolNet;
 
 public class WebTop extends AbstractWebPage implements InterfaceWebPage{
-    private BlockedDatas    m_datas;
+    private BlockHistry    m_datas;
     private IptablesLog     m_iptables_log;
 
     public WebTop(WebConfig cfg) {
@@ -50,7 +50,7 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
         LocalDate startDate = endDate.plusDays( Integer.parseInt( this.m_config.getMethod( "edit_days" ).orElse("7") ) * (-1) );
 
         // 初期化～読み込み
-        this.m_datas = new BlockedDatas( this.m_config );
+        this.m_datas = new BlockHistry( this.m_config );
         boolean result = false;
         this.m_datas.init();
 
@@ -79,7 +79,7 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
 
         // block状態確認
         for ( String idx: this.m_datas.getDatas().keySet() ){
-            BlockData bd = this.m_datas.getDatas().get( idx );
+            BlockHistryData bd = this.m_datas.getDatas().get( idx );
             if ( bd.getIp().isEmpty() ) continue;
             int a = this.m_iptables_log.ClassA( bd.getIp().get() );
 
@@ -252,7 +252,7 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
         String col3day = ToolDate.Fromat( LocalDate.now().plusDays( -2 ), "uuuuMMdd" ).orElse( "-" );
 
         for ( String idx: this.m_datas.getDatas().keySet() ){
-            BlockData bd = this.m_datas.getDatas().get( idx );
+            BlockHistryData bd = this.m_datas.getDatas().get( idx );
             String add_opt = "";
 
             if ( bd.matchBlockCondition( "black_list" ) ){

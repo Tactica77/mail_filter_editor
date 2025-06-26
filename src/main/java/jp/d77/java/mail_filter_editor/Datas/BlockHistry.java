@@ -22,28 +22,29 @@ import jp.d77.java.mail_filter_editor.BasicIO.ToolNet;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
 import jp.d77.java.mail_filter_editor.BasicIO.WhoisResult;
 
-public class BlockedDatas {
-//08:12:16<>198.163.193.63<>198.163.192.0/20<>code_550<>NL<>Sagawa-exp.lostari60@gzpp.com<>ml@d77.jp<>RIPE<>
+public class BlockHistry {
+    // format: 0:HH:mm:ss<>1:ip<>2:cidr<>3:error_codes<>4:cc<>5:from<>to<>7:org
+    //08:12:16<>198.163.193.63<>198.163.192.0/20<>code_550<>NL<>Sagawa-exp.lostari60@gzpp.com<>ml@d77.jp<>RIPE<>
     private WebConfig   m_config;
-    private HashMap<String,BlockData>   m_datas;
-    private HashMap<String,ArrayList<BlockData>>  m_filedatas;
+    private HashMap<String,BlockHistryData>   m_datas;
+    private HashMap<String,ArrayList<BlockHistryData>>  m_filedatas;
     private HashMap<String, Integer>    m_score_i;  // IP
     private HashMap<String, Integer>    m_score_o;  // ORG
     private HashMap<String, Integer>    m_score_r;  // Range
     
-    public BlockedDatas( WebConfig cfg ){
+    public BlockHistry( WebConfig cfg ){
         this.m_config = cfg;
     }
 
     public void init(){
-        this.m_datas = new HashMap<String,BlockData>();
-        this.m_filedatas = new HashMap<String,ArrayList<BlockData>>();
+        this.m_datas = new HashMap<String,BlockHistryData>();
+        this.m_filedatas = new HashMap<String,ArrayList<BlockHistryData>>();
         this.m_score_i = new HashMap<String, Integer>();
         this.m_score_o = new HashMap<String, Integer>();
         this.m_score_r = new HashMap<String, Integer>();
     }
 
-    public HashMap<String,BlockData> getDatas(){
+    public HashMap<String,BlockHistryData> getDatas(){
         return this.m_datas;
     }
 
@@ -74,9 +75,9 @@ public class BlockedDatas {
             return false;
         }
 
-        ArrayList<BlockData> bds = this.m_filedatas.get(YMD);
+        ArrayList<BlockHistryData> bds = this.m_filedatas.get(YMD);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
-            for ( BlockData bd: bds ){
+            for ( BlockHistryData bd: bds ){
                 writer.write( bd.getSaveLine() );
                 writer.newLine();  // 改行
             }
@@ -109,11 +110,11 @@ public class BlockedDatas {
                 LocalDateTime dt = this.cnvDateTime( target_date, columns[0] );
                 if ( dt == null ) continue;
 
-                BlockData d;
+                BlockHistryData d;
                 if ( !this.m_filedatas.containsKey( YMD ) ) {
-                    this.m_filedatas.put( YMD, new ArrayList<BlockData>() );
+                    this.m_filedatas.put( YMD, new ArrayList<BlockHistryData>() );
                 }
-                d = new BlockData();
+                d = new BlockHistryData();
                 this.m_filedatas.get( YMD ).add(d);
 
                 // 0: date time
@@ -174,19 +175,19 @@ public class BlockedDatas {
      * スコアを作成
      */
     public void createScore(){
-        this.m_datas = new HashMap<String,BlockData>();
+        this.m_datas = new HashMap<String,BlockHistryData>();
 
         for ( String YMD: this.m_filedatas.keySet() ){
             Debugger.LogPrint( YMD );
-            for ( BlockData bd_from: this.m_filedatas.get(YMD) ){
+            for ( BlockHistryData bd_from: this.m_filedatas.get(YMD) ){
                 if ( bd_from.getIp().isEmpty() ) continue;
                 String idx = YMD + "_" + bd_from.getIp().get();
 
-                BlockData bd_to;
+                BlockHistryData bd_to;
                 if ( this.m_datas.containsKey( idx ) ) {
                     bd_to = this.m_datas.get( idx );
                 }else{
-                    bd_to = new BlockData();
+                    bd_to = new BlockHistryData();
                     this.m_datas.put( idx, bd_to );
                 }
 

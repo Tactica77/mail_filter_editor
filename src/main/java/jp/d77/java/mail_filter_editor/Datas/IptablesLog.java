@@ -79,7 +79,7 @@ public class IptablesLog {
 
     public int ClassA( String cidr ){
         try {
-            String[] a = cidr.split(".");
+            String[] a = cidr.split("\\.");
             return Integer.parseInt( a[0] );
         } catch ( Exception e ){
             return -1;

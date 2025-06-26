@@ -33,13 +33,20 @@ public class SharedWebLib {
     public static String linkBlockEditor( String cidr, String cc, String org ){
         if ( cidr == null || cidr.isEmpty() || cidr.equals("-") ) return "-";
 
+        String[] cidrs = cidr.split(",");
+        ArrayList<String> link_opt = new ArrayList<String>();
         ArrayList<String> res = new ArrayList<String>();
-        if ( cc != null && ! cc.isEmpty() ) res.add( "edit_new_cc=" + HtmlString.HtmlEscape( cc ) );
-        if ( cidr != null && ! cidr.isEmpty() ) res.add( "edit_new_cidr=" + HtmlString.HtmlEscape( cidr ) );
-        if ( org != null && ! org.isEmpty() ) res.add( "edit_new_org=" + HtmlString.HtmlEscape( org ) );
-        return "<A Href=\"/block_editor?" + String.join("&", res) + "\" target=\"blank\">" + HtmlString.HtmlEscape( cidr ) + "</A>"
-            + SharedWebLib.linkWhois( HtmlString.UriEscape( cidr ) )
-            + SharedWebLib.linkSubnets( HtmlString.UriEscape( cidr ) );
+
+        if ( cc != null && ! cc.isEmpty() ) link_opt.add( "edit_new_cc=" + HtmlString.HtmlEscape( cc ) );
+        if ( cidr != null && ! cidr.isEmpty() ) link_opt.add( "edit_new_cidr=" + HtmlString.HtmlEscape( cidr ) );
+        if ( org != null && ! org.isEmpty() ) link_opt.add( "edit_new_org=" + HtmlString.HtmlEscape( org ) );
+
+        for ( String c: cidrs ){
+            res.add( "<A Href=\"/block_editor?" + String.join("&", link_opt) + "\" target=\"blank\">" + HtmlString.HtmlEscape( c ) + "</A>"
+                + SharedWebLib.linkWhois( HtmlString.UriEscape( c ) )
+                + SharedWebLib.linkSubnets( HtmlString.UriEscape( c ) ) );
+        }
+        return String.join( " ", res );
     }
 
     public static String[] linkIpBasic( String... ips ){

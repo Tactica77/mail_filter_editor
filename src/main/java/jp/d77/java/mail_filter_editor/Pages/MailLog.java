@@ -147,9 +147,14 @@ public class MailLog extends AbstractWebPage implements InterfaceWebPage{
             this.dispDetailTable();
         }else if ( this.m_config.getMethod( "mode" ).orElse( "").equals( "ipcount") ){
             this.m_html.addStringCr( HtmlGraph.getHeaderScript() );
+            super.displayFormTop();
+            this.displayForm();
+            super.displayFormBtm();
             this.dispIpList();
         }else{
+            super.displayFormTop();
             this.displayForm();
+            super.displayFormBtm();
             this.dispTable();
         }            
     }
@@ -341,7 +346,7 @@ public class MailLog extends AbstractWebPage implements InterfaceWebPage{
 
         // Table Header
         f.tableHeadTop();
-        f.tableRowTh( "IP", "Blocked", "Cnt", "CC", "Range", "Organization" );
+        f.tableRowTh( "IP", "YMD", "Blocked", "Cnt", "CC", "Range", "Organization" );
         f.tableHeadBtm();
 
         f.tableBodyTop();
@@ -357,15 +362,28 @@ public class MailLog extends AbstractWebPage implements InterfaceWebPage{
             // IP
             f.tableTdHtml( SharedWebLib.linkBlockEditor(ip, cc, org) );
 
+            // YMD
+            String ymd_disp = "";
+            for ( String ymd: this.m_log_list.getIpCnt().get( ip ).getDailyCount().keySet() ){
+                ymd_disp += ymd + "(" + this.m_log_list.getIpCnt().get( ip ).getDailyCount().get( ymd ) + ")<BR>";
+            }
+            f.tableTdHtml( ymd_disp );
+
             // Blocked
             if ( this.m_iptables_log != null ){
-                String a[] = ip.split(".");
+                if ( ip.equals("213.159.77.21") ){
+                    Debugger.TracePrint();
+                }
+                String a[] = ip.split("\\.");
                 int class_a = 0;
                 if ( a.length > 0 ) class_a = ToolNums.Str2Int( a[0] ).orElse( 0 );
                 boolean m = false;
                 for( IptablesLogData ild: this.m_iptables_log.getDatas() ){
-                    if ( ild.getCidr().isEmpty() ) continue;
+                    if ( ild.getCidr().get().isEmpty() ) continue;
                     if ( ild.getClassA() != class_a ) continue;
+                    if ( ild.getCidr().get().startsWith("213.159.77.21") && ip.equals("213.159.77.21") ){
+                        Debugger.TracePrint();
+                    }
                     if ( ToolNet.isWithinCIDR( ip, ild.getCidr().get() ).orElse("").equals( ip )  ){
                         f.tableTd( ild.getCidr().get() );
                         m = true;

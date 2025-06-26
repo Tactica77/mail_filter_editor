@@ -1,6 +1,7 @@
 package jp.d77.java.mail_filter_editor.Pages;
 
 import jp.d77.java.mail_filter_editor.BasicIO.BSSForm;
+import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
 import jp.d77.java.mail_filter_editor.BasicIO.HtmlString;
 import jp.d77.java.mail_filter_editor.BasicIO.ToolNet;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
@@ -47,6 +48,7 @@ public class WebSubnets extends AbstractWebPage implements InterfaceWebPage{
     @Override
     public void displayHeader(){
         super.displayHeader();
+        this.m_html.addString(BSSForm.getTableHeader( "mfe" ));
     }
 
     /**
@@ -54,7 +56,8 @@ public class WebSubnets extends AbstractWebPage implements InterfaceWebPage{
      */
     @Override
     public void displayNavbar() {
-    }
+        Debugger.TracePrint();
+        SharedWebLib.Navbar( this.m_config, this.m_html );    }
 
     /**
      * 7:displayInfo

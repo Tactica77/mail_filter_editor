@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import jp.d77.java.mail_filter_editor.BasicIO.ToolDate;
 
-public class BlockData {
+public class BlockHistryData {
     public ArrayList<LocalDateTime> m_datetime = new ArrayList<LocalDateTime>();
     public ArrayList<String>    m_blocked = new ArrayList<String>();
     public String    m_ip;
@@ -68,9 +68,9 @@ public class BlockData {
     public int getCount(){
         return this.m_count;
     }
-
     /**
      * 保存用１行データへ変換する
+     * format: 0:HH:mm:ss<>1:ip<>2:cidr<>3:error_codes<>4:cc<>5:from<>to<>7:org
      * @return
      */
     public String getSaveLine(){
