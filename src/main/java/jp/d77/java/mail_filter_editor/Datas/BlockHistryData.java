@@ -78,7 +78,7 @@ public class BlockHistryData {
 
         // 0: date time
         if ( this.m_datetime == null ) ret += "";
-        else ret += ToolDate.Fromat( this.m_datetime.get(0), "HH:mm:ss");
+        else ret += ToolDate.Fromat( this.m_datetime.get(0), "HH:mm:ss").orElse("");
         ret += "<>";
 
         // 1: ip

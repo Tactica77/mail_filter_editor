@@ -12,6 +12,7 @@ import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
 import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
 import jp.d77.java.mail_filter_editor.BasicIO.ToolNums;
 import jp.d77.java.mail_filter_editor.Pages.AbstractWebPage;
+import jp.d77.java.mail_filter_editor.Pages.CliUpdateBlockData;
 import jp.d77.java.mail_filter_editor.Pages.MailLog;
 import jp.d77.java.mail_filter_editor.Pages.WebBlockEditor;
 import jp.d77.java.mail_filter_editor.Pages.WebSubnets;
@@ -148,7 +149,22 @@ public class MailFilterEditorMain {
         return this.procWeb( web );
     }
 
+    @RequestMapping("/update_blockdata")  // ルートへこのメソッドをマップする
+    public String UpdateBlockdata( HttpServletRequest request ) {
+        Debugger.startTimer();
+        Debugger.LogPrint( "------ START ------" );
+
+        // 表示用クラスの設定
+        AbstractWebPage web = new CliUpdateBlockData( new WebConfig( "/update_blockdata" ) );
+
+        // Modeを取得
+        web.getConfig().addMethod("mode", WebUtils.findParameterValue(request, "mode") );
+        return this.procWeb( web );
+    }
+
+
     private String procWeb( AbstractWebPage Web ){
+        ToolWhois.setCacheFile( Web.getConfig().getDataFilePath() + "/whois_cache.json" );
         Debugger.TracePrint();
         Web.init();
         Web.load();

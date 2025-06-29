@@ -1,11 +1,11 @@
 package jp.d77.java.mail_filter_editor.Pages;
 
+import jp.d77.java.mail_filter_editor.ToolWhois;
 import jp.d77.java.mail_filter_editor.BasicIO.BSSForm;
 import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
 import jp.d77.java.mail_filter_editor.BasicIO.HtmlString;
 import jp.d77.java.mail_filter_editor.BasicIO.ToolNet;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
-import jp.d77.java.mail_filter_editor.BasicIO.WhoisResult;
 
 public class WebSubnets extends AbstractWebPage implements InterfaceWebPage{
 
@@ -106,18 +106,16 @@ public class WebSubnets extends AbstractWebPage implements InterfaceWebPage{
             f.tableTd( r[1] );
 
             // WHOIS RANGE
-            WhoisResult whois = ToolNet.getWhois( r[0] ).orElse( null );
             String cidr = "-";
             String cc = "-";
             String org = "-";
             String rir = "-";
-            if ( whois != null ){
-                if ( whois.getResult().containsKey("sp_cidr") ) cidr = whois.getResult().get("sp_cidr").get(0);
-                if ( whois.getResult().containsKey("sp_country") ) cc = whois.getResult().get("sp_country").get(0);
-                if ( whois.getResult().containsKey("sp_organization") ) org = whois.getResult().get("sp_organization").get(0);
-                else if ( whois.getResult().containsKey("sp_organization2") ) org = whois.getResult().get("sp_organization2").get(0);
-                else if ( whois.getResult().containsKey("sp_organization3") ) org = whois.getResult().get("sp_organization3").get(0);
-                rir = whois.getServer();
+            ToolWhois.WhoisData wd = ToolWhois.get( r[0], true ).orElse(null);
+            if ( wd != null ){
+                if ( wd.getCidr().isPresent() ) cidr = wd.getCidr().get().get(0);
+                cc = wd.getCc().orElse( "-" );
+                org = wd.getOrg().orElse( "-" );
+                rir = wd.getServer().orElse( "-" );
             }
 
             f.tableTdHtml( SharedWebLib.linkBlockEditor(cidr, cc, org) );

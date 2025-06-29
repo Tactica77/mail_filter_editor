@@ -112,6 +112,14 @@ public class HtmlString {
         return HtmlUtils.htmlEscape( s );
     }
 
+    static public String HtmlEscapeBr( String s ){
+        String res = "";
+        for( String v: s.split("\n") ){
+            res += HtmlUtils.htmlEscape( v ) + "<BR>\n";
+        }
+        return res;
+    }
+
     static public String HtmlUnescape( String s ){
         return HtmlUtils.htmlUnescape( s );
     }

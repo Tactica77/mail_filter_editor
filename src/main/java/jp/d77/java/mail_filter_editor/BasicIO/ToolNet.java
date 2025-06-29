@@ -3,29 +3,10 @@ package jp.d77.java.mail_filter_editor.BasicIO;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 public class ToolNet {
-    private static HashMap<String, WhoisResult> whois_result = new HashMap<String, WhoisResult>();
-
-    public static boolean isWhoisCached( String ipAddress ){
-        return ToolNet.whois_result.containsKey(ipAddress);
-    }
-    
-    public static Optional<WhoisResult> getWhois( String ipAddress ){
-        // キャッシュを返す
-        if ( ToolNet.whois_result.containsKey(ipAddress) ) return Optional.ofNullable( ToolNet.whois_result.get(ipAddress) );
-        ToolNet.whois_result.put(ipAddress, new WhoisResult() );
-        if ( ToolNet.whois_result.get( ipAddress ).requestWhois( ipAddress ) ){
-            return Optional.ofNullable( ToolNet.whois_result.get(ipAddress) );
-        }else{
-            ToolNet.whois_result.remove( ipAddress );
-            return Optional.empty();
-        }
-    }
-
     /**
      * 255.255.255.0→24
      * @param mask

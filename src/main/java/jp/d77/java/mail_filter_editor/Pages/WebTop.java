@@ -27,6 +27,15 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
     @Override
     public void init() {
         this.m_config.setPageTitle( this.m_config.getPageTitle() + " - Top" );
+
+        this.m_config.alertInfo.addStringBr( "/top ... メールエラー状況(/log/YYYYMM/block_ip_YYYYMMDD.log)とブロック状況(make_iptables.log)を表示します。表示時に3件分のWhois情報を更新します。" );
+        this.m_config.alertInfo.addStringBr( "/update_blockdata ... 処理内容は上記に近く、Whois情報を更新してRange/CC/Orgを補完し保存します。cron用処理。" );
+        this.m_config.alertInfo.addStringBr( "/block_editor ... block_list_black.txtを編集する。編集後はiptablesが更新され、make_iptables.logが生成される。" );
+        this.m_config.alertInfo.addStringBr( "/whois ... 引数にip=IPアドレスを指定することで、whois情報を表示する。rwhoisにもおそらく対応。whois.iana.orgを起点に地域インターネットレジストリ(RIR)を追って結果を表示する。" );
+        this.m_config.alertInfo.addStringBr( "/subnets ... 引数にip=IPアドレスを指定することで、CIDR値1～32のCC、Organizationなどを一覧表示する。" );
+        this.m_config.alertInfo.addStringBr( "/mail_log ... メール送受信ログを解析した結果を表示メール送受信が成立してない通信を摘発用。" );
+        this.m_config.alertInfo.addStringBr( "/mail_log?mode=ipcount ... 同上だが、IP毎/日毎の件数で集計。" );
+        this.m_config.alertInfo.addStringBr( "---" );
         this.m_config.alertInfo.addStringBr( "(W)...whois検索" );
         this.m_config.alertInfo.addStringBr( "(S)...subnet一覧表示" );
         this.m_config.alertInfo.addStringBr( "450...Sender address rejected: Domain not found" );
@@ -57,10 +66,11 @@ public class WebTop extends AbstractWebPage implements InterfaceWebPage{
         LocalDate date = startDate;
         int cnt = 0;
         while ( true ) {
+            // startDate～endDateへループ読み込み
             if ( this.m_datas.load( date ) ) result = true;
             if ( ! date.isBefore(endDate) ) break;
             date = date.plusDays(1);
-            if ( cnt >= 30 ) break;
+            if ( cnt >= 30 ) break; // 最大30日
             cnt++;
         }
         if ( ! result ) this.m_datas = null;    // 読み込み失敗

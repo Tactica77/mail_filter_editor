@@ -1,14 +1,18 @@
 package jp.d77.java.mail_filter_editor.Pages;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+
+import jp.d77.java.mail_filter_editor.ToolWhois;
 import jp.d77.java.mail_filter_editor.BasicIO.BSSForm;
 import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
 import jp.d77.java.mail_filter_editor.BasicIO.HtmlString;
-import jp.d77.java.mail_filter_editor.BasicIO.ToolNet;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
-import jp.d77.java.mail_filter_editor.BasicIO.WhoisResult;
 
 public class WebWhois extends AbstractWebPage implements InterfaceWebPage{
-    private WhoisResult m_whois;
+    //private WhoisResult m_whois;
     public WebWhois(WebConfig cfg) {
         super(cfg);
     }
@@ -27,12 +31,20 @@ public class WebWhois extends AbstractWebPage implements InterfaceWebPage{
     @Override
     public void load() {
         if ( this.getConfig().getMethod("ip").isEmpty() ) return;
+
+        String server = ToolWhois.requestWhois( this.getConfig().getMethod("ip").get() ).orElse( null );
+        if ( server == null ){
+            this.m_config.alertError.addStringBr( "whois error" );
+            return;
+        }
+        /*
         this.m_whois = ToolNet.getWhois( this.getConfig().getMethod("ip").get() ).orElse( null );
         if ( this.m_whois == null ) {
             this.m_config.alertError.addStringBr( "whois error" );
             return;
         }
         if ( this.m_whois.getError().isPresent() ) this.m_config.alertError.addStringBr( "whois error:" + this.m_whois.getError().get() );
+         */
     }
 
     /**
@@ -56,6 +68,15 @@ public class WebWhois extends AbstractWebPage implements InterfaceWebPage{
     public void displayHeader(){
         super.displayHeader();
         this.m_html.addString(BSSForm.getTableHeader( "mfe" ));
+        this.m_html.addString(
+            "<STYLE>"
+            + ".scroll-cell {\n"
+            + "  max-height: 300px;\n"
+            + "  overflow-y: auto;\n"
+            + "  display: block;\n"
+            + "}\n"
+            + "</STYLE>"
+            );
     }
 
     /**
@@ -82,61 +103,78 @@ public class WebWhois extends AbstractWebPage implements InterfaceWebPage{
     public void displayBody(){
         super.displayBody();
 
+        // ヘッダー
         if ( this.getConfig().getMethod("ip").isEmpty() ) {
             this.m_html.addStringCr( HtmlString.h( 1, "ip=null") );
             return;
         }else{
             this.m_html.addStringCr( HtmlString.h( 1, "ip=" + this.getConfig().getMethod("ip").get() ) );
         }
-        if ( this.m_whois == null ) return;
+        //if ( this.m_whois == null ) return;
 
-        BSSForm f = BSSForm.newForm();
-
-        // Results
-        f.tableTop("whois_table");
-        f.tableBodyTop();
-        if ( this.m_whois.getResult().containsKey( "sp_cidr" ) ){
-            f.tableRowTop();
-            f.tableTh( "CIDR" );
-            f.tableTdHtml( String.join(",", SharedWebLib.linkIpBasic( this.m_whois.getResult().get( "sp_cidr" ).toArray( new String[0] ) ) ) );
-            f.tableRowBtm();
+        LinkedHashMap<String,ToolWhois.WhoisData> wd = new LinkedHashMap<String,ToolWhois.WhoisData>();
+        String server = "whois.iana.org";
+        while ( true ) {
+            if ( wd.containsKey( server ) ) break;
+            Debugger.LogPrint( "ip=" + this.getConfig().getMethod("ip").get() + " server=" + server );
+            ToolWhois.WhoisData w = ToolWhois.getWhoisCache().get( this.getConfig().getMethod("ip").get() ).get( server );
+            wd.put( server, w );
+            if ( w.getChildServer().isEmpty() ) break;
+            server = w.getChildServer().get();
         }
-        if ( this.m_whois.getResult().containsKey( "sp_country" ) ){
-            f.tableRowTop();
-            f.tableTh( "Country" );
-            f.tableTd( String.join(",", this.m_whois.getResult().get( "sp_country" ) ) );
-            f.tableRowBtm();
-        }
-        if ( this.m_whois.getResult().containsKey( "sp_organization" ) ){
-            f.tableRowTop();
-            f.tableTh( "Organization" );
-            f.tableTd( String.join(",", this.m_whois.getResult().get( "sp_organization" ) ) );
-            f.tableRowBtm();
-        }
-        f.tableBodyBtm();
-        f.tableBtm();
-        this.m_html.addString( f.toString() );
 
-        // history
-        f = BSSForm.newForm();
-        f.tableTop("whois_table");
+        List<String> keys = new ArrayList<>(wd.keySet());
+        Collections.reverse(keys);
 
-        WhoisResult wr = this.m_whois;
-        for ( int i = 0; i < 6; i ++ ) {
-            f.tableHeadTop();
-            f.tableRowTh( wr.getThisServer() );
-            f.tableHeadBtm();
+        for ( String key : keys ) {
 
+            BSSForm f = BSSForm.newForm();
+            // Results
+            f.tableTop("whois_table");
             f.tableBodyTop();
-            f.tableRowTd( wr.getWhoisResult() );
+            if ( wd.get(key).getServer().isPresent() ){
+                f.tableRowTop();
+                f.tableTh( "WhoisServer" );
+                f.tableTd( String.join(",", wd.get(key).getServer().get() ) );
+                f.tableRowBtm();
+            }
+            if ( wd.get(key).getChildServer().isPresent() ){
+                f.tableRowTop();
+                f.tableTh( "ReferredServer" );
+                f.tableTd( String.join(",", wd.get(key).getChildServer().get() ) );
+                f.tableRowBtm();
+            }
+            if ( wd.get(key).getCidr().isPresent() ){
+                f.tableRowTop();
+                f.tableTh( "CIDR" );
+                f.tableTdHtml( String.join(",", SharedWebLib.linkIpBasic( wd.get(key).getCidr().get().toArray( new String[0] ) ) ) );
+                f.tableRowBtm();
+            }
+            if ( wd.get(key).getCc().isPresent() ){
+                f.tableRowTop();
+                f.tableTh( "Country" );
+                f.tableTd( String.join(",", wd.get(key).getCc().get() ) );
+                f.tableRowBtm();
+            }
+            if ( wd.get(key).getOrg().isPresent() ){
+                f.tableRowTop();
+                f.tableTh( "Organization" );
+                f.tableTd( String.join(",", wd.get(key).getOrg().get() ) );
+                f.tableRowBtm();
+            }
             f.tableBodyBtm();
+            f.tableBtm();
 
-            if ( wr.getChild().isEmpty() ) break;
-            wr = wr.getChild().get();
+            f.tableTop("whois_table");
+            f.tableBodyTop();
+            f.tableRowTop();
+            f.tableTdHtml( "<DIV class=\"scroll-cell\">\n" + HtmlString.HtmlEscapeBr( wd.get(key).getQueryResult() ) + "\n</DIV>\n" );
+            f.tableRowBtm();
+            f.tableBodyBtm();
+            f.tableBtm();
+
+            this.m_html.addString( f.toString() );
         }
-
-        f.tableBtm();
-        this.m_html.addString( f.toString() );
     }
 
     /**

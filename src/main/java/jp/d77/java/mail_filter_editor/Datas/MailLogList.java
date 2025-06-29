@@ -12,12 +12,11 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jp.d77.java.mail_filter_editor.ToolWhois;
 import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
 import jp.d77.java.mail_filter_editor.BasicIO.ToolDate;
-import jp.d77.java.mail_filter_editor.BasicIO.ToolNet;
 import jp.d77.java.mail_filter_editor.BasicIO.ToolNums;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
-import jp.d77.java.mail_filter_editor.BasicIO.WhoisResult;
 import jp.d77.java.mail_filter_editor.Datas.MailLogData.LogLine;
 
 public class MailLogList {
@@ -33,8 +32,6 @@ public class MailLogList {
         public void setIp( String YMD, String ip ){
             this.m_ip = ip;
             this.m_cnt++;
-            if ( ToolNet.isWhoisCached(ip) ) this.setWhois();
-
             if ( YMD == null ) return;
             if ( ! this.m_dailycnt.containsKey( YMD ) ) this.m_dailycnt.put( YMD, 0 );
             this.m_dailycnt.put( YMD, this.m_dailycnt.get( YMD ) + 1 );
@@ -48,17 +45,11 @@ public class MailLogList {
         public LinkedHashMap<String,Integer> getDailyCount() { return this.m_dailycnt; }
 
         public void setWhois(){
-            WhoisResult wr = ToolNet.getWhois( this.m_ip ).orElse( null );
-            if ( wr == null ) return;
-            if ( wr.getResult().containsKey("sp_cidr") && wr.getResult().get("sp_cidr").size() > 0 ){
-                this.m_cidr = wr.getResult().get("sp_cidr").get(0);
-            }
-            if ( wr.getResult().containsKey("sp_country") && wr.getResult().get("sp_country").size() > 0 ){
-                this.m_cc = wr.getResult().get("sp_country").get(0);
-            }
-            if ( wr.getResult().containsKey("sp_organization") && wr.getResult().get("sp_organization").size() > 0 ){
-                this.m_org = wr.getResult().get("sp_organization").get(0);
-            }
+            ToolWhois.WhoisData wd = ToolWhois.get( this.m_ip, false).orElse( null );
+            if ( wd == null ) return;
+            if ( wd.getCidr().isPresent() ) this.m_cidr = wd.getCidr().get().get(0);
+            if ( wd.getCc().isPresent() ) this.m_cc = wd.getCc().get();
+            if ( wd.getOrg().isPresent() ) this.m_org = wd.getOrg().get();
             this.m_whois_loaded = true;
         }
     }

@@ -16,11 +16,10 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import jp.d77.java.mail_filter_editor.ToolWhois;
 import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
 import jp.d77.java.mail_filter_editor.BasicIO.ToolDate;
-import jp.d77.java.mail_filter_editor.BasicIO.ToolNet;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
-import jp.d77.java.mail_filter_editor.BasicIO.WhoisResult;
 
 public class BlockHistry {
     // format: 0:HH:mm:ss<>1:ip<>2:cidr<>3:error_codes<>4:cc<>5:from<>to<>7:org
@@ -91,6 +90,7 @@ public class BlockHistry {
     }
 
     public boolean load( LocalDate target_date ){
+        boolean change_data = false;
         String YM = ToolDate.Fromat( target_date, "uuuuMM" ).orElse(null);
         String YMD = ToolDate.Fromat( target_date, "uuuuMMdd" ).orElse(null);
         if ( YM == null || YMD == null ) return false;
@@ -143,24 +143,22 @@ public class BlockHistry {
                 if ( columns.length >= 8 ) d.m_org = columns[7];
 
                 if ( ( d.m_range == null || d.m_org == null || d.m_range.isEmpty() || d.m_org.isEmpty() ) && whois_counter >= 0 ){
-                    WhoisResult wr;
-                    if ( ! ToolNet.isWhoisCached( d.m_ip ) ){
-                        whois_counter--;
-                    }
-                    wr = ToolNet.getWhois( d.m_ip ).orElse( null );
-
-                    if ( wr != null ) {
-                        if ( wr.getResult().containsKey("sp_cidr") && wr.getResult().get("sp_cidr").size() > 0 ){
-                            d.m_range = wr.getResult().get("sp_cidr").get(0);
+                    // whoisデータを補完する
+                    ToolWhois.WhoisData wd = ToolWhois.get( d.m_ip, true ).orElse( null );
+                    if ( wd != null ){
+                        if ( wd.getCidr().isPresent() ){
+                            d.m_range = String.join(",", wd.getCidr().get() );
                         }
-                        if ( wr.getResult().containsKey("sp_country") && wr.getResult().get("sp_country").size() > 0 ){
-                            d.m_country_code = wr.getResult().get("sp_country").get(0);
-                        }
-                        if ( wr.getResult().containsKey("sp_organization") && wr.getResult().get("sp_organization").size() > 0 ){
-                            d.m_org = wr.getResult().get("sp_organization").get(0);
-                        }
+                        d.m_country_code = wd.getCc().orElse( null );
+                        d.m_org = wd.getOrg().orElse( null );
+                        change_data = true;
                     }
                 }
+            }
+
+            if ( change_data ){
+                // データを書き換えたので、保存する。
+                this.save(target_date);
             }
         } catch (FileNotFoundException e) {
         } catch (IOException e) {
