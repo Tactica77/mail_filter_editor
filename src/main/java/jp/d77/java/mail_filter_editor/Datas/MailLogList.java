@@ -135,6 +135,9 @@ public class MailLogList {
     }
 
     public boolean setData( int id, String YMD, LocalDate target_date, String line ){
+        if ( id == 13 ){
+            Debugger.TracePrint();
+        }
         if ( this.m_datas.containsKey( YMD ) == false ){
             this.m_datas.put( YMD, new LinkedHashMap<Integer,MailLogData>() );
         }
@@ -148,7 +151,7 @@ public class MailLogList {
         mld.setId(id);
 
         // 正規表現で抽出
-        Pattern pattern = Pattern.compile( "^(\\w{3} \\d{1,2}) (\\d{2}:\\d{2}:\\d{2}) (\\S+) ([^\\[]+)\\[(\\d+)\\]:\\s?(.*)$" );
+        Pattern pattern = Pattern.compile( "^(\\w{3}\\s+\\d{1,2}) (\\d{2}:\\d{2}:\\d{2}) (\\S+) ([^\\[]+)\\[(\\d+)\\]:\\s?(.*)$" );
         Matcher matcher = pattern.matcher(line);
 
         if (matcher.matches()) {

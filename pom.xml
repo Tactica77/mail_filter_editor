@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>jp.d77.java</groupId>
 	<artifactId>mail_filter_editor</artifactId>
-	<version>1.0.5</version>
+	<version>1.0.7</version>
 	<name>mail_filter_editor</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
@@ -28,7 +28,7 @@
 	</scm>
 	<properties>
 		<java.version>20</java.version>
-		<release.date>2025-06-29</release.date>
+		<release.date>2025-07-03</release.date>
 	</properties>
 	<dependencies>
 

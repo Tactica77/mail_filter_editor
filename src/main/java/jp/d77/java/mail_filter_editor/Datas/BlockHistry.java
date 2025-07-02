@@ -148,10 +148,16 @@ public class BlockHistry {
                     if ( wd != null ){
                         if ( wd.getCidr().isPresent() ){
                             d.m_range = String.join(",", wd.getCidr().get() );
+                            change_data = true;
                         }
-                        d.m_country_code = wd.getCc().orElse( null );
-                        d.m_org = wd.getOrg().orElse( null );
-                        change_data = true;
+                        if ( wd.getCc().isPresent() ){
+                            d.m_country_code = wd.getCc().orElse( null );
+                            change_data = true;
+                        }
+                        if ( wd.getOrg().isPresent() ){
+                            d.m_org = wd.getOrg().orElse( null );
+                            change_data = true;
+                        }
                     }
                 }
             }

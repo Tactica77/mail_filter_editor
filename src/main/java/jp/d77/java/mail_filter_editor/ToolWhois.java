@@ -144,7 +144,7 @@ public class ToolWhois {
             if ( ! this.getResult( "sp_organization2").isEmpty() && this.getResult( "sp_organization2").get().size() > 0 ) 
                 return Optional.ofNullable( this.getResult( "sp_organization2" ).get().get(0) );
             if ( ! this.getResult( "sp_organization3").isEmpty() && this.getResult( "sp_organization3").get().size() > 0 ) 
-                return Optional.ofNullable( this.getResult( "sp_organization" ).get().get(0) );
+                return Optional.ofNullable( this.getResult( "sp_organization3" ).get().get(0) );
             return Optional.empty();
         }
 
@@ -315,12 +315,37 @@ public class ToolWhois {
 
     private static Optional<String> queryWhois( String ip, String server ){
         String res = "";
+
+        if ( server.equals( "whois.arin.net" ) ){
+            res = ToolWhois.queryArinWhois(ip, server).orElse(null);
+            if ( res != null ) return Optional.ofNullable( res );
+            res = "";
+        }
+
         try (Socket socket = new Socket( server, 43);
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
             String line;
             out.println( ip );
+            while ((line = in.readLine()) != null) {
+                res += line + "\n";
+            }
+            return Optional.ofNullable( res );
+        } catch (Exception e) {
+            //e.printStackTrace();
+            return Optional.empty();
+        }
+    }
+
+    private static Optional<String> queryArinWhois( String ip, String server ){
+        String res = "";
+        try (Socket socket = new Socket( server, 43);
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+
+            String line;
+            out.println( "n + " + ip );
             while ((line = in.readLine()) != null) {
                 res += line + "\n";
             }
