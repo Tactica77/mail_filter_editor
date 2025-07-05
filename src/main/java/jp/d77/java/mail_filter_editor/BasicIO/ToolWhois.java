@@ -241,23 +241,36 @@ public class ToolWhois {
                 ToolWhois.m_whois_result.get( ip ).put(server, new WhoisData() ); // データ初期化
                 bres = ToolWhois.queryRWhois( ip, server, ToolWhois.m_whois_result.get( ip ).get(server) );
             }else{
-                bres = ToolWhois.queryWhois1( ip, server, ToolWhois.m_whois_result.get( ip ).get(server) );
-                if ( ! bres ){
-                    bres = ToolWhois.queryWhois2( ip, server, ToolWhois.m_whois_result.get( ip ).get(server) );
+                ToolWhois.m_whois_result.get( ip ).put(server, new WhoisData() ); // データ初期化
+                bres = ToolWhois.queryWhois( "", ip, server, ToolWhois.m_whois_result.get( ip ).get(server) );
+                if ( bres == false ){
+                    ToolWhois.m_whois_result.get( ip ).put(server, new WhoisData() ); // データ初期化
+                    bres = ToolWhois.queryWhois( "n ", ip, server, ToolWhois.m_whois_result.get( ip ).get(server) );
+                }
+                if ( bres == false ){
+                    ToolWhois.m_whois_result.get( ip ).put(server, new WhoisData() ); // データ初期化
+                    bres = ToolWhois.queryWhois( "n + ", ip, server, ToolWhois.m_whois_result.get( ip ).get(server) );
                 }
             }
             if ( !bres ){
                 String new_ip = ToolWhois.changeCheckIP( ToolWhois.m_whois_result.get( ip ).get(server) ).orElse( null );
                 if ( new_ip == null ) return Optional.empty();
+                if ( new_ip.equals( ip ) ) return Optional.empty();
                 Debugger.LogPrint( "change check IP: " + ip + " -> " + new_ip );
 
                 if ( server.endsWith( ":4321" ) ){
                     ToolWhois.m_whois_result.get( ip ).put(server, new WhoisData() ); // データ初期化
                     bres = ToolWhois.queryRWhois( new_ip, server, ToolWhois.m_whois_result.get( ip ).get(server) );
                 }else{
-                    bres = ToolWhois.queryWhois1( new_ip, server, ToolWhois.m_whois_result.get( ip ).get(server) );
-                    if ( ! bres ){
-                        bres = ToolWhois.queryWhois2( new_ip, server, ToolWhois.m_whois_result.get( ip ).get(server) );
+                    ToolWhois.m_whois_result.get( ip ).put(server, new WhoisData() ); // データ初期化
+                    bres = ToolWhois.queryWhois( "", new_ip, server, ToolWhois.m_whois_result.get( ip ).get(server) );
+                    if ( bres == false ){
+                        ToolWhois.m_whois_result.get( ip ).put(server, new WhoisData() ); // データ初期化
+                        bres = ToolWhois.queryWhois( "n ", new_ip, server, ToolWhois.m_whois_result.get( ip ).get(server) );
+                    }
+                    if ( bres == false ){
+                        ToolWhois.m_whois_result.get( ip ).put(server, new WhoisData() ); // データ初期化
+                        bres = ToolWhois.queryWhois( "n + ", new_ip, server, ToolWhois.m_whois_result.get( ip ).get(server) );
                     }
                 }
             }
@@ -312,8 +325,8 @@ public class ToolWhois {
         return true;
     }
 
-    private static boolean queryWhois1( String ip, String server, WhoisData wd ){
-        Debugger.LogPrint( "ip=" + ip + " server=" + server );
+    private static boolean queryWhois( String request_head, String ip, String server, WhoisData wd ){
+        Debugger.LogPrint( "request_head=" + request_head + " ip=" + ip + " server=" + server );
         String request_ip = ip;
         if ( request_ip.contains( "/" ) ){
             // Cider指定
@@ -328,44 +341,7 @@ public class ToolWhois {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
             String line;
-            out.println( request_ip );
-            while ((line = in.readLine()) != null) {
-                res += line + "\n";
-            }
-        } catch (Exception e) {
-            //e.printStackTrace();
-            return false;
-        }
-
-        wd.setQueryResult( res );
-        wd.setDate( LocalDate.now() );
-
-        if ( ToolWhois.checkWhoisResult( wd, server ) ){
-            // OK
-            ToolWhois.m_must_save = true;
-            return true;
-        }
-
-        return false;
-    }
-
-    private static boolean queryWhois2( String ip, String server, WhoisData wd ){
-        Debugger.LogPrint( "ip=" + ip + " server=" + server );
-        String request_ip = ip;
-        if ( request_ip.contains( "/" ) ){
-            // Cider指定
-            String[] w = request_ip.split( "\\/" );
-            if ( w.length >= 1 ) request_ip = w[0];
-        }
-
-        String res = "";
-
-        try (Socket socket = new Socket( server, 43);
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-
-            String line;
-            out.println( "n " + request_ip );
+            out.println( request_head + request_ip );
             while ((line = in.readLine()) != null) {
                 res += line + "\n";
             }
@@ -480,18 +456,17 @@ public class ToolWhois {
             ){
             List<String> cidr = ToolNet.convertToCIDR(value);
             wd.addResult( "sp_cidr", String.join(",", cidr));
-
-            //Debugger.LogPrint( "sp_cidr=" + String.join(",", cidr) );
+            //Debugger.LogPrint( "...sp_cidr=" + String.join(",", cidr) );
 
         }else if ( key.toLowerCase().equals("country") ){
             wd.addResult( "sp_country", value);
-            //Debugger.LogPrint( "sp_country=" + value );
+            //Debugger.LogPrint( "...sp_country=" + value );
 
         }else if ( key.toLowerCase().equals("orgname")
             || key.equals("org-name")
             ){
             wd.addResult( "sp_organization", value);
-            //Debugger.LogPrint( "sp_organization=" + value );
+            //Debugger.LogPrint( "...sp_organization=" + value );
 
         }else if ( key.equals("descr")
             || key.contains("organization")
@@ -499,7 +474,7 @@ public class ToolWhois {
             || key.equals("[name]")
             ){
             wd.addResult( "sp_organization2", value);
-            //Debugger.LogPrint( "sp_organization2=" + value );
+            //Debugger.LogPrint( "...sp_organization2=" + value );
 
         }else if ( key.equals("role")
             || key.equals("org")
@@ -507,7 +482,7 @@ public class ToolWhois {
             || key.equals("netname")
             ){
             wd.addResult( "sp_organization3", value);
-            //Debugger.LogPrint( "sp_organization3=" + value );
+            //Debugger.LogPrint( "...sp_organization3=" + value );
         }
 
         // 別のWhoisサーバを要求されてるかチェック
