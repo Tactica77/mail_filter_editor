@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
 import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
 import jp.d77.java.mail_filter_editor.BasicIO.ToolNums;
+import jp.d77.java.mail_filter_editor.BasicIO.ToolWhois;
 import jp.d77.java.mail_filter_editor.Pages.AbstractWebPage;
 import jp.d77.java.mail_filter_editor.Pages.CliUpdateBlockData;
 import jp.d77.java.mail_filter_editor.Pages.MailLog;

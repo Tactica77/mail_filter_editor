@@ -5,10 +5,10 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import jp.d77.java.mail_filter_editor.ToolWhois;
 import jp.d77.java.mail_filter_editor.BasicIO.BSSForm;
 import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
 import jp.d77.java.mail_filter_editor.BasicIO.HtmlString;
+import jp.d77.java.mail_filter_editor.BasicIO.ToolWhois;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
 
 public class WebWhois extends AbstractWebPage implements InterfaceWebPage{
