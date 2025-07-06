@@ -7,6 +7,9 @@ import java.util.Optional;
 import java.util.Set;
 
 import jp.d77.java.mail_filter_editor.MailFilterEditorApplication;
+import jp.d77.java.tools.BasicIO.Debugger;
+import jp.d77.java.tools.BasicIO.ProgramProp;
+import jp.d77.java.tools.HtmlIO.HtmlString;
 
 public class WebConfig {
     private HashMap<String,String> Methods;
@@ -53,7 +56,7 @@ public class WebConfig {
         if ( value == null ){
         }else if ( value.isEmpty() || value.isBlank() ){
         }else{
-            Debugger.LogPrint( "name=" + name + " value=" + value);
+            Debugger.InfoPrint( "name=" + name + " value=" + value);
             this.Methods.put( name, value );
             this.alertBottomInfo.addStringBr("addMethod name=" + name + " value=" + value);
         }
@@ -65,7 +68,7 @@ public class WebConfig {
         }else{
             this.MethodLists.put(name, new ArrayList<String>());
             for ( String v: values ){
-                Debugger.LogPrint( "name=" + name + " value=" + v);
+                Debugger.InfoPrint( "name=" + name + " value=" + v);
                 this.MethodLists.get(name).add(v);
                 this.alertBottomInfo.addStringBr("addMethodLists name=" + name + " value=" + v);
             }

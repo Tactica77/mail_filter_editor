@@ -4,20 +4,20 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.TreeMap;
 
-import jp.d77.java.mail_filter_editor.BasicIO.BSOpts;
-import jp.d77.java.mail_filter_editor.BasicIO.BSSForm;
-import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
 import jp.d77.java.mail_filter_editor.BasicIO.HtmlGraph;
-import jp.d77.java.mail_filter_editor.BasicIO.HtmlString;
-import jp.d77.java.mail_filter_editor.BasicIO.ToolDate;
 import jp.d77.java.mail_filter_editor.BasicIO.ToolNet;
-import jp.d77.java.mail_filter_editor.BasicIO.ToolNums;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
 import jp.d77.java.mail_filter_editor.BasicIO.HtmlGraph.GRAPH_TYPE;
 import jp.d77.java.mail_filter_editor.Datas.IptablesLog;
 import jp.d77.java.mail_filter_editor.Datas.MailLogData;
 import jp.d77.java.mail_filter_editor.Datas.MailLogData.LogLine;
 import jp.d77.java.mail_filter_editor.Datas.MailLogList;
+import jp.d77.java.tools.BasicIO.Debugger;
+import jp.d77.java.tools.BasicIO.ToolDate;
+import jp.d77.java.tools.BasicIO.ToolNums;
+import jp.d77.java.tools.HtmlIO.BSOpts;
+import jp.d77.java.tools.HtmlIO.BSSForm;
+import jp.d77.java.tools.HtmlIO.HtmlString;
 import jp.d77.java.mail_filter_editor.Datas.IptablesLog.IptablesLogData;
 
 public class MailLog extends AbstractWebPage implements InterfaceWebPage{
@@ -65,7 +65,7 @@ public class MailLog extends AbstractWebPage implements InterfaceWebPage{
                 ).orElse( LocalDate.now() );
             
             // 表示範囲始
-            LocalDate startDate = endDate.plusDays( Integer.parseInt( this.m_config.getMethod( "edit_days" ).orElse("7") ) * (-1) );
+            LocalDate startDate = endDate.plusDays( Integer.parseInt( this.m_config.getMethod( "edit_days" ).orElse("3") ) * (-1) );
 
             // 初期化～読み込み
             this.m_log_list = new MailLogList( this.m_config );
@@ -278,7 +278,7 @@ public class MailLog extends AbstractWebPage implements InterfaceWebPage{
                 BSOpts.init()
                 .type( "number")
                 .name( "edit_days")
-                .value( this.m_config.getMethod("edit_days").orElse( "7" ))
+                .value( this.m_config.getMethod("edit_days").orElse( "3" ))
             )
         .divBtm(2);
 

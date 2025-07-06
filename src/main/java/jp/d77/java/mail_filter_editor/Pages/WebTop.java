@@ -2,15 +2,15 @@ package jp.d77.java.mail_filter_editor.Pages;
 
 import java.time.LocalDate;
 
-import jp.d77.java.mail_filter_editor.BasicIO.BSOpts;
-import jp.d77.java.mail_filter_editor.BasicIO.BSSForm;
 import jp.d77.java.mail_filter_editor.Datas.BlockHistryData;
 import jp.d77.java.mail_filter_editor.Datas.BlockHistry;
 import jp.d77.java.mail_filter_editor.Datas.IptablesLog;
 import jp.d77.java.mail_filter_editor.Datas.IptablesLog.IptablesLogData;
+import jp.d77.java.tools.BasicIO.Debugger;
+import jp.d77.java.tools.BasicIO.ToolDate;
+import jp.d77.java.tools.HtmlIO.BSOpts;
+import jp.d77.java.tools.HtmlIO.BSSForm;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
-import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
-import jp.d77.java.mail_filter_editor.BasicIO.ToolDate;
 import jp.d77.java.mail_filter_editor.BasicIO.ToolNet;
 
 public class WebTop extends AbstractWebPage implements InterfaceWebPage{

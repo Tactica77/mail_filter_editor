@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import jp.d77.java.tools.BasicIO.Debugger;
+
 public class ToolNet {
     /**
      * 255.255.255.0→24
@@ -224,7 +226,7 @@ public class ToolNet {
             }
             return Optional.empty();
         } catch (Exception e) {
-            Debugger.LogPrint( "cmp error: " + cidrA + " " + cidrB + " " + e.getMessage() );
+            Debugger.ErrorPrint( "cmp error: " + cidrA + " " + cidrB + " " + e.getMessage() );
             return Optional.empty();
         }
     }

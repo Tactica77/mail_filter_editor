@@ -1,15 +1,15 @@
 package jp.d77.java.mail_filter_editor.Pages;
 
-import jp.d77.java.mail_filter_editor.BasicIO.BSOpts;
-import jp.d77.java.mail_filter_editor.BasicIO.BSS;
-import jp.d77.java.mail_filter_editor.BasicIO.BSSForm;
-import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
-import jp.d77.java.mail_filter_editor.BasicIO.HtmlString;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
+import jp.d77.java.tools.BasicIO.Debugger;
+import jp.d77.java.tools.HtmlIO.BSOpts;
+import jp.d77.java.tools.HtmlIO.BSS;
+import jp.d77.java.tools.HtmlIO.BSSForm;
+import jp.d77.java.tools.HtmlIO.HtmlString;
 
 public abstract class AbstractWebPage{
-    protected WebConfig      m_config;
-    protected HtmlString  m_html;
+    protected WebConfig     m_config;
+    protected HtmlString    m_html;
 
     // コンストラクタ
     public AbstractWebPage( WebConfig cfg ){
@@ -33,9 +33,8 @@ public abstract class AbstractWebPage{
     // 5:displayHeader
     public void displayHeader(){
         Debugger.TracePrint();
-        this.m_html.addString( BSS.getHeader( this.m_config ) );
-        //this.m_html.addString(BSSForm.getTableHeader( "mfe" ));
-}
+        this.m_html.addString( BSS.getHeader( this.m_config.ProgramName, this.m_config.getAddHeader().toString() ) );
+    }
     
     // 6:displayNavbar
     public abstract void displayNavbar();
@@ -49,21 +48,21 @@ public abstract class AbstractWebPage{
             // Debug
         if ( ! this.m_config.alertDebug.isEmpty() && this.m_config.isDebug() ) {
             this.m_html.addString(
-                BSS.alert( BSS.ALERT.DEBUG, this.m_config.alertDebug.toString() )
+                BSSForm.alert( BSSForm.ALERT.DEBUG, this.m_config.alertDebug.toString() )
             );
         }
 
         // Error
         if ( ! this.m_config.alertError.isEmpty() ) {
             this.m_html.addString(
-                BSS.alert( BSS.ALERT.ERROR, this.m_config.alertError.toString() )
+                BSSForm.alert( BSSForm.ALERT.ERROR, this.m_config.alertError.toString() )
             );
         }
         
         // Info
         if ( ! this.m_config.alertInfo.isEmpty() ) {
             this.m_html.addString(
-                BSS.alert( BSS.ALERT.INFO, this.m_config.alertInfo.toString() )
+                BSSForm.alert( BSSForm.ALERT.INFO, this.m_config.alertInfo.toString() )
             );
         }
     }
@@ -82,7 +81,7 @@ public abstract class AbstractWebPage{
     public void displayBottomInfo(){
         Debugger.TracePrint();
         this.m_html.addString(
-            BSS.alert( BSS.ALERT.INFO, this.m_config.alertBottomInfo.toString() )
+            BSSForm.alert( BSSForm.ALERT.INFO, this.m_config.alertBottomInfo.toString() )
         );
         this.m_html.addStringCr( "</DIV>    <!-- container-fluid -->")
             .addStringCr("</DIV>    <!-- row -->" );
@@ -91,7 +90,7 @@ public abstract class AbstractWebPage{
     // 10:displayFooter
     public void displayFooter(){
         Debugger.TracePrint();
-        this.m_html.addString( BSS.getFooter( this.m_config ) );
+        this.m_html.addString( BSS.getFooter( this.m_config.ProgramName + " " + this.m_config.ProgramVersion ) );
     }
 
     public String toString(){

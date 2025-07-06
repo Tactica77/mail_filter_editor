@@ -5,11 +5,11 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import jp.d77.java.mail_filter_editor.BasicIO.BSSForm;
-import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
-import jp.d77.java.mail_filter_editor.BasicIO.HtmlString;
 import jp.d77.java.mail_filter_editor.BasicIO.ToolWhois;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
+import jp.d77.java.tools.BasicIO.Debugger;
+import jp.d77.java.tools.HtmlIO.BSSForm;
+import jp.d77.java.tools.HtmlIO.HtmlString;
 
 public class WebWhois extends AbstractWebPage implements InterfaceWebPage{
     //private WhoisResult m_whois;
@@ -116,7 +116,7 @@ public class WebWhois extends AbstractWebPage implements InterfaceWebPage{
         String server = "whois.iana.org";
         while ( true ) {
             if ( wd.containsKey( server ) ) break;
-            Debugger.LogPrint( "ip=" + this.getConfig().getMethod("ip").get() + " server=" + server );
+            Debugger.InfoPrint( "ip=" + this.getConfig().getMethod("ip").get() + " server=" + server );
             ToolWhois.WhoisData w = ToolWhois.getWhoisCache().get( this.getConfig().getMethod("ip").get() ).get( server );
             wd.put( server, w );
             if ( w.getChildServer().isEmpty() ) break;

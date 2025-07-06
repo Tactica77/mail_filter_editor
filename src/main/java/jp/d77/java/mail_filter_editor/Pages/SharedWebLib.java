@@ -2,11 +2,11 @@ package jp.d77.java.mail_filter_editor.Pages;
 
 import java.util.ArrayList;
 
-import jp.d77.java.mail_filter_editor.BasicIO.BSOpts;
-import jp.d77.java.mail_filter_editor.BasicIO.BSS;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
-import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
-import jp.d77.java.mail_filter_editor.BasicIO.HtmlString;
+import jp.d77.java.tools.BasicIO.Debugger;
+import jp.d77.java.tools.HtmlIO.BSOpts;
+import jp.d77.java.tools.HtmlIO.BSS;
+import jp.d77.java.tools.HtmlIO.HtmlString;
 
 public class SharedWebLib {
     public static void Navbar( WebConfig cfg, HtmlString html ){

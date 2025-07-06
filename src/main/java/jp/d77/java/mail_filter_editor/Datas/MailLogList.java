@@ -12,12 +12,12 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
-import jp.d77.java.mail_filter_editor.BasicIO.ToolDate;
-import jp.d77.java.mail_filter_editor.BasicIO.ToolNums;
 import jp.d77.java.mail_filter_editor.BasicIO.ToolWhois;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
 import jp.d77.java.mail_filter_editor.Datas.MailLogData.LogLine;
+import jp.d77.java.tools.BasicIO.Debugger;
+import jp.d77.java.tools.BasicIO.ToolDate;
+import jp.d77.java.tools.BasicIO.ToolNums;
 
 public class MailLogList {
     public class IpCnt{
@@ -120,7 +120,7 @@ public class MailLogList {
             e.printStackTrace();
             return false;
         }
-        Debugger.LogPrint( "file=" + filename + " lines=" + cnt );
+        Debugger.InfoPrint( "file=" + filename + " lines=" + cnt );
         return true;
     }
     

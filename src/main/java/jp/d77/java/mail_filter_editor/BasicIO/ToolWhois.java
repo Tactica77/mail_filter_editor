@@ -17,8 +17,10 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jp.d77.java.mail_filter_editor.Datas.JsonIO;
-import jp.d77.java.mail_filter_editor.Datas.JsonIO.DATA_TYPE;
+import jp.d77.java.tools.BasicIO.Debugger;
+import jp.d77.java.tools.BasicIO.ToolNums;
+import jp.d77.java.tools.Datas.JsonIO;
+import jp.d77.java.tools.Datas.JsonIO.DATA_TYPE;
 
 public class ToolWhois {
     /**
@@ -216,17 +218,17 @@ public class ToolWhois {
         if ( ! ToolWhois.m_whois_result.containsKey( ip ) ){
             // IP未登録
             ToolWhois.m_whois_result.put( ip, new HashMap<String, WhoisData>() );
-            Debugger.LogPrint( "not regist ip=" + ip );
+            Debugger.InfoPrint( "not regist ip=" + ip );
         }
         if ( ! ToolWhois.m_whois_result.get( ip ).containsKey( server ) ){
             // サーバ未登録
             ToolWhois.m_whois_result.get( ip ).put(server, new WhoisData() );
             need_query = true;
-            Debugger.LogPrint( "not regist ip=" + ip + " server=" + server );
+            Debugger.InfoPrint( "not regist ip=" + ip + " server=" + server );
         }
         if ( ToolWhois.m_whois_result.get( ip ).get( server ).expired() ){
             // キャッシュ有効期限切れ
-            Debugger.LogPrint( "cache expired ip=" + ip + " server=" + server );
+            Debugger.InfoPrint( "cache expired ip=" + ip + " server=" + server );
             need_query = true;
         }
         
@@ -256,7 +258,7 @@ public class ToolWhois {
                 String new_ip = ToolWhois.changeCheckIP( ToolWhois.m_whois_result.get( ip ).get(server) ).orElse( null );
                 if ( new_ip == null ) return Optional.empty();
                 if ( new_ip.equals( ip ) ) return Optional.empty();
-                Debugger.LogPrint( "change check IP: " + ip + " -> " + new_ip );
+                Debugger.InfoPrint( "change check IP: " + ip + " -> " + new_ip );
 
                 if ( server.endsWith( ":4321" ) ){
                     ToolWhois.m_whois_result.get( ip ).put(server, new WhoisData() ); // データ初期化
@@ -288,11 +290,11 @@ public class ToolWhois {
 
         if ( ToolWhois.m_whois_result.get( ip ).get( server ).getChildServer().isEmpty() || level >= 5 ) {
             // child serverが設定されている
-            Debugger.LogPrint( "level=" + level + " ip=" + ip + " server=" + server + " child_server=empty" + " cache_read=" + (!need_query) );
+            Debugger.InfoPrint( "level=" + level + " ip=" + ip + " server=" + server + " child_server=empty" + " cache_read=" + (!need_query) );
             if ( ToolWhois.m_must_save ) ToolWhois.save();
             return Optional.ofNullable( server );
         }
-        Debugger.LogPrint( "level=" + level + " ip=" + ip + " server=" + server + " child_server=" + server + " cache_read=" + (!need_query) );
+        Debugger.InfoPrint( "level=" + level + " ip=" + ip + " server=" + server + " child_server=" + server + " cache_read=" + (!need_query) );
         return ToolWhois.requestWhois( level + 1, ip, ToolWhois.m_whois_result.get( ip ).get( server ).getChildServer().get(), exec_query );
     }
 
@@ -326,7 +328,7 @@ public class ToolWhois {
     }
 
     private static boolean queryWhois( String request_head, String ip, String server, WhoisData wd ){
-        Debugger.LogPrint( "request_head=" + request_head + " ip=" + ip + " server=" + server );
+        Debugger.InfoPrint( "request_head=" + request_head + " ip=" + ip + " server=" + server );
         String request_ip = ip;
         if ( request_ip.contains( "/" ) ){
             // Cider指定
@@ -363,7 +365,7 @@ public class ToolWhois {
     }
 
     private static boolean queryRWhois( String ip, String server, WhoisData wd ){
-        Debugger.LogPrint( "ip=" + ip + " server=" + server );
+        Debugger.InfoPrint( "ip=" + ip + " server=" + server );
         String request_ip = ip;
         if ( request_ip.contains( "/" ) ){
             // Cider指定
@@ -397,7 +399,7 @@ public class ToolWhois {
             String line;
             while ((line = in.readLine()) != null) {
                 res += line + "\n";
-                Debugger.LogPrint( line );
+                //Debugger.InfoPrint( line );
             }
 
         } catch (IOException e) {

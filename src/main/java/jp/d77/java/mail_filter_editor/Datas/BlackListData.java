@@ -2,8 +2,8 @@ package jp.d77.java.mail_filter_editor.Datas;
 
 import java.util.Optional;
 
-import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
 import jp.d77.java.mail_filter_editor.BasicIO.ToolNet;
+import jp.d77.java.tools.BasicIO.Debugger;
 
 public class BlackListData {
     private String  m_cidr;
@@ -98,7 +98,7 @@ public class BlackListData {
     public void checkDuplicateCidr( String cidr ){
         if ( ToolNet.isWithinCIDR( cidr, this.m_cidr ).orElse("").equals( cidr ) ){
             this.m_duplicate_cidr = cidr;
-            Debugger.LogPrint( this.m_cidr + " is contained in " + cidr );
+            Debugger.InfoPrint( this.m_cidr + " is contained in " + cidr );
         }
     }
 

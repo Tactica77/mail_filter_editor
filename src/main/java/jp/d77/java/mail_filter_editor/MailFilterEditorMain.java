@@ -9,8 +9,6 @@ import org.springframework.web.util.WebUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
-import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
-import jp.d77.java.mail_filter_editor.BasicIO.ToolNums;
 import jp.d77.java.mail_filter_editor.BasicIO.ToolWhois;
 import jp.d77.java.mail_filter_editor.Pages.AbstractWebPage;
 import jp.d77.java.mail_filter_editor.Pages.CliUpdateBlockData;
@@ -19,6 +17,8 @@ import jp.d77.java.mail_filter_editor.Pages.WebBlockEditor;
 import jp.d77.java.mail_filter_editor.Pages.WebSubnets;
 import jp.d77.java.mail_filter_editor.Pages.WebTop;
 import jp.d77.java.mail_filter_editor.Pages.WebWhois;
+import jp.d77.java.tools.BasicIO.Debugger;
+import jp.d77.java.tools.BasicIO.ToolNums;
 
 //https://qiita.com/zumax/items/8effa97f338dd0224b22
 
@@ -26,8 +26,8 @@ import jp.d77.java.mail_filter_editor.Pages.WebWhois;
 public class MailFilterEditorMain {
     @RequestMapping("/")  // ルートへこのメソッドをマップする
     public String mail_filter_editor( HttpServletRequest request ) {
-        Debugger.startTimer();
-        Debugger.LogPrint( "------ START ------" );
+        Debugger.initTimer();
+        Debugger.InfoPrint( "------ START ------" );
 
         // 表示用クラスの設定
         AbstractWebPage web = new WebTop( new WebConfig( "/" ) );
@@ -57,8 +57,8 @@ public class MailFilterEditorMain {
 
     @RequestMapping("/block_editor")  // ルートへこのメソッドをマップする
     public String BlockEditor( HttpServletRequest request ) {
-        Debugger.startTimer();
-        Debugger.LogPrint( "------ START ------" );
+        Debugger.initTimer();
+        Debugger.InfoPrint( "------ START ------" );
 
         // 表示用クラスの設定
         AbstractWebPage web = new WebBlockEditor( new WebConfig( "/block_editor" ) );
@@ -93,8 +93,8 @@ public class MailFilterEditorMain {
 
     @RequestMapping("/whois")  // ルートへこのメソッドをマップする
     public String whois( HttpServletRequest request ) {
-        Debugger.startTimer();
-        Debugger.LogPrint( "------ START ------" );
+        Debugger.initTimer();
+        Debugger.InfoPrint( "------ START ------" );
 
         // 表示用クラスの設定
         AbstractWebPage web = new WebWhois( new WebConfig( "/whois" ) );
@@ -107,8 +107,8 @@ public class MailFilterEditorMain {
 
     @RequestMapping("/subnets")  // ルートへこのメソッドをマップする
     public String subnets( HttpServletRequest request ) {
-        Debugger.startTimer();
-        Debugger.LogPrint( "------ START ------" );
+        Debugger.initTimer();
+        Debugger.InfoPrint( "------ START ------" );
 
         // 表示用クラスの設定
         AbstractWebPage web = new WebSubnets( new WebConfig( "/subnets" ) );
@@ -121,8 +121,8 @@ public class MailFilterEditorMain {
 
     @RequestMapping("/mail_log")  // ルートへこのメソッドをマップする
     public String MailLog( HttpServletRequest request ) {
-        Debugger.startTimer();
-        Debugger.LogPrint( "------ START ------" );
+        Debugger.initTimer();
+        Debugger.InfoPrint( "------ START ------" );
 
         // 表示用クラスの設定
         AbstractWebPage web = new MailLog( new WebConfig( "/mail_log" ) );
@@ -152,8 +152,8 @@ public class MailFilterEditorMain {
 
     @RequestMapping("/update_blockdata")  // ルートへこのメソッドをマップする
     public String UpdateBlockdata( HttpServletRequest request ) {
-        Debugger.startTimer();
-        Debugger.LogPrint( "------ START ------" );
+        Debugger.initTimer();
+        Debugger.InfoPrint( "------ START ------" );
 
         // 表示用クラスの設定
         AbstractWebPage web = new CliUpdateBlockData( new WebConfig( "/update_blockdata" ) );
@@ -177,7 +177,7 @@ public class MailFilterEditorMain {
         Web.displayBody();
         Web.displayBottomInfo();
         Web.displayFooter();
-       Debugger.LogPrint( "------ Done bytes="  + ToolNums.FromatedNum( Web.toString().length() ) + " ------" );
+       Debugger.InfoPrint( "------ Done bytes="  + ToolNums.FromatedNum( Web.toString().length() ) + " ------" );
         return Web.toString();
     }
 }

@@ -12,8 +12,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
+import jp.d77.java.tools.BasicIO.Debugger;
 
 public class BlackList {
     private WebConfig   m_config;
@@ -99,14 +99,14 @@ public class BlackList {
         if ( this.m_isUpdate == false ) return false;
         String filename = this.m_config.getDataFilePath() + "/block_list_black.txt";
         File f_filename = new File( filename );
-        Debugger.LogPrint( "file=" + filename );
+        Debugger.InfoPrint( "file=" + filename );
 
         // すでにファイルが存在していればバックアップを作成
         File f_bkfile = new File( filename + ".bak" );
         try {
             if ( f_filename.exists()) {
                 Files.copy( f_filename.toPath(), f_bkfile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                Debugger.LogPrint( "backup " + f_bkfile );
+                Debugger.InfoPrint( "backup " + f_bkfile );
             }
         } catch ( Exception e) {
             e.printStackTrace();
@@ -131,7 +131,7 @@ public class BlackList {
     public boolean load(){
         this.init();
         String filename = this.m_config.getDataFilePath() + "/block_list_black.txt";
-        Debugger.LogPrint( "file=" + filename );
+        Debugger.InfoPrint( "file=" + filename );
 
         try (BufferedReader br = new BufferedReader(new FileReader( filename ))) {
             String line;

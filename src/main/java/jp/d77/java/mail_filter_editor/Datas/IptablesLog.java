@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import jp.d77.java.mail_filter_editor.BasicIO.Debugger;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
+import jp.d77.java.tools.BasicIO.Debugger;
 
 public class IptablesLog {
     public class IptablesLogData {
@@ -43,7 +43,7 @@ public class IptablesLog {
     public boolean load(){
         this.init();
         String filename = this.m_config.getDataFilePath() + "/make_iptables.log";
-        Debugger.LogPrint( "file=" + filename );
+        Debugger.InfoPrint( "file=" + filename );
 
         try (BufferedReader br = new BufferedReader(new FileReader( filename ))) {
             String line;
@@ -64,7 +64,7 @@ public class IptablesLog {
                 ild.m_code = items[20];
                 ild.m_classA = this.ClassA( ild.m_cidr );
             }
-            Debugger.LogPrint( "loaded ok=" + ok + " ng=" + ng);
+            Debugger.InfoPrint( "loaded ok=" + ok + " ng=" + ng);
 
         } catch (FileNotFoundException e) {
             this.m_config.alertError.addStringBr( "IpTablesログが見つかりませんでした:" + filename + " e=" + e.getMessage() );

@@ -2,9 +2,9 @@ package jp.d77.java.mail_filter_editor.Pages;
 
 import java.time.LocalDate;
 
-import jp.d77.java.mail_filter_editor.BasicIO.ToolNums;
 import jp.d77.java.mail_filter_editor.BasicIO.WebConfig;
 import jp.d77.java.mail_filter_editor.Datas.BlockHistry;
+import jp.d77.java.tools.BasicIO.ToolNums;
 
 public class CliUpdateBlockData extends AbstractWebPage implements InterfaceWebPage {
     private BlockHistry    m_datas;

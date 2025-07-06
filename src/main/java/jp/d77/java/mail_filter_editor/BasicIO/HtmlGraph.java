@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Optional;
 
+import jp.d77.java.tools.BasicIO.Debugger;
+import jp.d77.java.tools.HtmlIO.HtmlString;
+
 public class HtmlGraph {
     public class dbf_prop {
         public GRAPH_TYPE   m_type = GRAPH_TYPE.NULL;
@@ -96,7 +99,7 @@ public class HtmlGraph {
 
     public dbf getDbf(){ return this.m_dbf; }
     public String draw_graph( String graph_no ) {
-        Debugger.LogPrint( "count = " + this.m_dbf.getYMDList().length );
+        Debugger.InfoPrint( "count = " + this.m_dbf.getYMDList().length );
         String graph_id = this.m_dbf.getDbId() + "_" + graph_no;
         HtmlString  html = HtmlString.init();
         String opt = "";
